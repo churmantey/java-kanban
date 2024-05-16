@@ -1,3 +1,5 @@
+package dc.yandex.kanban.model;
+
 public class SubTask extends Task{
 
     private final Epic parentTask;

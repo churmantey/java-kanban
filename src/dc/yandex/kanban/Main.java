@@ -1,3 +1,8 @@
+package dc.yandex.kanban;
+
+import dc.yandex.kanban.model.*;
+import dc.yandex.kanban.service.*;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -25,9 +30,6 @@ public class Main {
         SubTask subTask1e2 = taskManager.createNewSubtask(epic2, "Купить сыр", "Упаковку моцареллы и кусок чеддера");
         taskManager.addSubTask(subTask1e2);
         printAllTasks(taskManager, " Созданы новые задачи, эпики и подзадачи");
-
-        System.out.println("=== Получение списка подзадач эпика 1:");
-        System.out.println(taskManager.getEpicSubTasks(epic1));
 
         System.out.println("=== Получение списка подзадач эпика 2 по id:");
         System.out.println(taskManager.getEpicSubTasksById(epic2.getId()));

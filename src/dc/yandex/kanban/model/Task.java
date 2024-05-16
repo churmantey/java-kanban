@@ -1,4 +1,7 @@
+package dc.yandex.kanban.model;
+
 import java.util.Objects;
+
 public class Task {
     private final int id;
     private String name;

@@ -1,4 +1,7 @@
+package dc.yandex.kanban.model;
+
 import java.util.HashMap;
+import java.util.ArrayList;
 
 public class Epic extends Task{
 
@@ -31,9 +34,9 @@ public class Epic extends Task{
         updateStatus();
     }
 
-    // Возвращает список всех подза дач эпика
-    public HashMap<Integer, SubTask> getSubTasks() {
-        return subTasks;
+    // Возвращает список всех подзадач эпика
+    public ArrayList<SubTask> getSubTasks() {
+        return new ArrayList<>(subTasks.values());
     }
 
     // Обновляет статус эпика на основе статусов подзадач
@@ -72,7 +75,7 @@ public class Epic extends Task{
     public String toString() {
         return getClass().getName() + "{" +
                 "id='" + super.getId() + '\'' +
-                ",subtasks_num=" + subTasks.size() + '\'' +
+                ",subtasks_id=" + subTasks.keySet() + '\'' +
                 ", status='" + super.getStatus() + '\'' +
                 ", name='" + super.getName() + '\'' +
                 ", description='" + super.getDescription() + '\'' +

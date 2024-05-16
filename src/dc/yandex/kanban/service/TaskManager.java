@@ -1,4 +1,11 @@
+package dc.yandex.kanban.service;
+
+import dc.yandex.kanban.model.Task;
+import dc.yandex.kanban.model.SubTask;
+import dc.yandex.kanban.model.Epic;
+
 import java.util.HashMap;
+import java.util.ArrayList;
 
 public class TaskManager {
 
@@ -16,37 +23,27 @@ public class TaskManager {
     }
 
     // Получает список всех обычных задач
-    public HashMap<Integer, Task> getTasks() {
-        return taskList;
+    public ArrayList<Task> getTasks() {
+        return new ArrayList<>(taskList.values());
     }
 
     // Получает список всех эпиков
-    public HashMap<Integer, Epic> getEpics() {
-        return epicList;
+    public ArrayList<Epic> getEpics() {
+        return new ArrayList<>(epicList.values());
     }
 
     // Получает список всех подзадач
-    public HashMap<Integer, SubTask> getSubTasks() {
-        return subTaskList;
+    public ArrayList<SubTask> getSubTasks() {
+        return new ArrayList<>(subTaskList.values());
     }
 
     // Получает список всех подзадач эпика по id эпика
-    public HashMap<Integer, SubTask> getEpicSubTasksById(int epicId) {
+    public ArrayList<SubTask> getEpicSubTasksById(int epicId) {
         if (epicList.containsKey(epicId)) {
             Epic epic = epicList.get(epicId);
             return epic.getSubTasks();
         } else {
             System.out.println("Эпик с id " + epicId + " не существует");
-            return null;
-        }
-    }
-
-    // Получает список всех подзадач эпика по переданному объекту эпика
-    public HashMap<Integer, SubTask> getEpicSubTasks(Epic epic) {
-        if (epic != null) {
-            return epic.getSubTasks();
-        } else {
-            System.out.println("Эпик не существует");
             return null;
         }
     }
@@ -78,9 +75,9 @@ public class TaskManager {
         } else if (epicList.containsKey(taskId)) {
             // Получаем эпик, удаляем все подзадачи эпика в списке, затем удаляем подзадачи в эпике.
             Epic epic = epicList.get(taskId);
-            HashMap<Integer, SubTask> epicSubTasks = epic.getSubTasks();
-            for (Integer id : epicSubTasks.keySet()) {
-                subTaskList.remove(id);
+            ArrayList<SubTask> epicSubTasks = epic.getSubTasks();
+            for (SubTask subTask : epicSubTasks) {
+                subTaskList.remove(subTask.getId());
             }
             epic.deleteAllSubTasks();
             epicList.remove(taskId);
@@ -129,8 +126,7 @@ public class TaskManager {
     // Добавляет задачу в список
     public void addTask(Task task) {
         if (task != null) {
-            int taskId = task.getId();
-            taskList.put(taskId, task);
+            taskList.put(task.getId(), task);
         } else {
             System.out.println("Попытка добавить null в качестве задачи.");
         }
@@ -139,8 +135,7 @@ public class TaskManager {
     // Добавляет эпик в список
     public void addEpic(Epic epic) {
         if (epic != null) {
-            int taskId = epic.getId();
-            epicList.put(taskId, epic);
+            epicList.put(epic.getId(), epic);
         } else {
             System.out.println("Попытка добавить null в качестве эпика.");
         }
