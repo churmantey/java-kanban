@@ -9,7 +9,7 @@ import dc.yandex.kanban.model.TaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
+import java.util.List;
 
 class InMemoryTaskManagerTest {
 
@@ -25,14 +25,14 @@ class InMemoryTaskManagerTest {
         Task task = new Task(1, "Задача 1", "Описание 1");
         manager.addTask(task);
         Task taskFromManager = manager.getTaskById(1);
-        ArrayList<Task> taskList = manager.getTasks();
+        List<Task> taskList = manager.getTasks();
 
         assertNotNull(taskFromManager, "Задача не найдена.");
         assertEquals(task.getId(), taskFromManager.getId());
         assertEquals(task.getName(), taskFromManager.getName());
         assertEquals(task.getDescription(), taskFromManager.getDescription());
         assertEquals(1, taskList.size(), "Задача не добавлена, список задач пуст!");
-        assertEquals(task, taskList.getFirst(), "Добавленная задача не совпала с исходной!");
+        assertEquals(task, taskList.get(0), "Добавленная задача не совпала с исходной!");
     }
 
     @Test
@@ -40,14 +40,14 @@ class InMemoryTaskManagerTest {
         Epic epic = new Epic(1, "Эпик 1", "Описание эпика 1");
         manager.addEpic(epic);
         Task epicFromManager = manager.getTaskById(1);
-        ArrayList<Epic> taskList = manager.getEpics();
+        List<Epic> taskList = manager.getEpics();
 
         assertNotNull(epicFromManager, "Эпик не найден.");
         assertEquals(epic.getId(), epicFromManager.getId());
         assertEquals(epic.getName(), epicFromManager.getName());
         assertEquals(epic.getDescription(), epicFromManager.getDescription());
         assertEquals(1, taskList.size(), "Эпик не добавлен, список эпиков пуст!");
-        assertEquals(epic, taskList.getFirst(), "Добавленный эпик не совпал с исходным!");
+        assertEquals(epic, taskList.get(0), "Добавленный эпик не совпал с исходным!");
     }
 
     @Test
@@ -56,14 +56,14 @@ class InMemoryTaskManagerTest {
         SubTask subTask = new SubTask(epic, 2, "Подзадача 1 эпика 1", "Описание подзадачи 1");
         manager.addSubTask(subTask);
         Task subTaskFromManager = manager.getTaskById(2);
-        ArrayList<SubTask> taskList = manager.getSubTasks();
+        List<SubTask> taskList = manager.getSubTasks();
 
         assertNotNull(subTaskFromManager, "Подзадача не найдена.");
         assertEquals(subTask.getId(), subTaskFromManager.getId());
         assertEquals(subTask.getName(), subTaskFromManager.getName());
         assertEquals(subTask.getDescription(), subTaskFromManager.getDescription());
         assertEquals(1, taskList.size(), "Подзадача не добавлена, список подзадач пуст!");
-        assertEquals(subTask, taskList.getFirst(), "Добавленная подзадача не совпала с исходной!");
+        assertEquals(subTask, taskList.get(0), "Добавленная подзадача не совпала с исходной!");
     }
 
     @Test
@@ -72,7 +72,7 @@ class InMemoryTaskManagerTest {
         SubTask subTask = new SubTask(epic, 2, "Подзадача 1 эпика 1", "Описание подзадачи 1");
         manager.addTask(epic);
         manager.addTask(subTask);
-        ArrayList<Task> taskList = manager.getTasks();
+        List<Task> taskList = manager.getTasks();
 
         assertEquals(0, taskList.size(), "Эпик/сабтаск добавлен как задача!");
     }

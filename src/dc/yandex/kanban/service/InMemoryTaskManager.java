@@ -4,14 +4,13 @@ import dc.yandex.kanban.model.Task;
 import dc.yandex.kanban.model.SubTask;
 import dc.yandex.kanban.model.Epic;
 
-import java.util.HashMap;
-import java.util.ArrayList;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    private final HashMap<Integer, Task> taskList; // Список всех обычных задач
-    private final HashMap<Integer, Epic> epicList; // Список всех эпиков
-    private final HashMap<Integer, SubTask> subTaskList; // Список всех подзадач
+    private final Map<Integer, Task> taskList; // Список всех обычных задач
+    private final Map<Integer, Epic> epicList; // Список всех эпиков
+    private final Map<Integer, SubTask> subTaskList; // Список всех подзадач
     private int taskCounter; // Счетчик для id задач,эпиков и подзадач
 
     private final HistoryManager historyManager;
@@ -26,25 +25,25 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Получает список всех обычных задач
     @Override
-    public ArrayList<Task> getTasks() {
+    public List<Task> getTasks() {
         return new ArrayList<>(taskList.values());
     }
 
     // Получает список всех эпиков
     @Override
-    public ArrayList<Epic> getEpics() {
+    public List<Epic> getEpics() {
         return new ArrayList<>(epicList.values());
     }
 
     // Получает список всех подзадач
     @Override
-    public ArrayList<SubTask> getSubTasks() {
+    public List<SubTask> getSubTasks() {
         return new ArrayList<>(subTaskList.values());
     }
 
     // Получает список всех подзадач эпика по id эпика
     @Override
-    public ArrayList<SubTask> getEpicSubTasksById(int epicId) {
+    public List<SubTask> getEpicSubTasksById(int epicId) {
         if (epicList.containsKey(epicId)) {
             Epic epic = epicList.get(epicId);
             return epic.getSubTasks();
@@ -206,8 +205,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Возвращает список истории просмотренных задач
     @Override
-    public ArrayList<Task> getHistory() {
-        return historyManager.getHistory();
+    public LinkedList<Task> getHistory() {
+        return (LinkedList<Task>) historyManager.getHistory();
     }
 
 }

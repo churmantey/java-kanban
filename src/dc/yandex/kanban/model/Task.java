@@ -59,10 +59,10 @@ public class Task {
     @Override
     public String toString() {
         return getClass().getName() + "{" +
-                "id='" + id + '\'' +
-                ", status='" + status + '\'' +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
+                "id='" + getId() + '\'' +
+                ", status='" + getStatus() + '\'' +
+                ", name='" + getName() + '\'' +
+                ", description='" + getDescription() + '\'' +
                 '}';
     }
 }

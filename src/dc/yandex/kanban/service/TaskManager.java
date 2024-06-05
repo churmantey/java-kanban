@@ -4,21 +4,22 @@ import dc.yandex.kanban.model.Epic;
 import dc.yandex.kanban.model.SubTask;
 import dc.yandex.kanban.model.Task;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public interface TaskManager {
 
     // Получает список всех обычных задач
-    ArrayList<Task> getTasks();
+    List<Task> getTasks();
 
     // Получает список всех эпиков
-    ArrayList<Epic> getEpics();
+    List<Epic> getEpics();
 
     // Получает список всех подзадач
-    ArrayList<SubTask> getSubTasks();
+    List<SubTask> getSubTasks();
 
     // Получает список всех подзадач эпика по id эпика
-    ArrayList<SubTask> getEpicSubTasksById(int epicId);
+    List<SubTask> getEpicSubTasksById(int epicId);
 
     // Получает задачу, эпик или подзадачу по переданному id
     Task getTaskById(int taskId);
@@ -62,5 +63,5 @@ public interface TaskManager {
     // Обновляет подзадачу
     void updateSubTask(SubTask subTask);
 
-    ArrayList<Task> getHistory();
+    LinkedList<Task> getHistory();
 }

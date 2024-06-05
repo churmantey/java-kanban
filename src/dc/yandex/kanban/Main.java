@@ -37,7 +37,20 @@ public class Main {
         System.out.println("=== Получение задачи по идентификатору :");
         System.out.println(taskManager.getTaskById(epic1.getId()));
 
-        System.out.println("=== Получение истории просмотров :");
+        System.out.println("=== Получение истории просмотров после 12 попаданий:");
+        taskManager.getTaskById(epic2.getId());
+        taskManager.getTaskById(epic2.getId());
+        taskManager.getTaskById(epic2.getId());
+        taskManager.getTaskById(epic2.getId());
+        taskManager.getTaskById(epic1.getId());
+        taskManager.getTaskById(epic1.getId());
+        taskManager.getTaskById(epic2.getId());
+        taskManager.getTaskById(subTask1e1.getId());
+        taskManager.getTaskById(subTask1e2.getId());
+        taskManager.getTaskById(epic2.getId());
+        taskManager.getTaskById(epic2.getId());
+        taskManager.getTaskById(epic2.getId());
+        System.out.println("Размер списка истории: " + taskManager.getHistory().size());
         System.out.println(taskManager.getHistory());
 
         task1.setStatus(TaskStatus.IN_PROGRESS);

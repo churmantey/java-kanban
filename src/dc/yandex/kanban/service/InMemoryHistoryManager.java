@@ -2,15 +2,16 @@ package dc.yandex.kanban.service;
 
 import dc.yandex.kanban.model.Task;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    private final ArrayList<Task> taskHistory; // История просмотренных задач
+    private final List<Task> taskHistory; // История просмотренных задач
     private final int MAX_HISTORY_SIZE = 10; // Размер списка истории просмотренных задач
 
     public InMemoryHistoryManager() {
-        taskHistory = new ArrayList<>();
+        taskHistory = new LinkedList<>();
     }
 
     // Добавляет задачу в историю просмотров
@@ -24,7 +25,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     // Получает список истории просмотров задач
     @Override
-    public ArrayList<Task> getHistory() {
-        return new ArrayList<>(taskHistory);
+    public List<Task> getHistory() {
+        return new LinkedList<>(taskHistory);
     }
 }

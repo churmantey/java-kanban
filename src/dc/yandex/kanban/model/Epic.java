@@ -46,15 +46,17 @@ public class Epic extends Task{
         boolean hasDone = false; // флаг наличия подзадач в статусе DONE
 
         for (SubTask subTask : subTasks.values()) {
-            if (subTask.getStatus() == TaskStatus.IN_PROGRESS) {
-                hasInProgress = true;
-                break;
+            switch (subTask.getStatus()) {
+                case IN_PROGRESS:
+                    hasInProgress = true;
+                    break;
+                case DONE:
+                    hasDone = true;
+                    break;
+                default:
+                    hasNew = true;
             }
-            if (subTask.getStatus() == TaskStatus.DONE) {
-                hasDone = true;
-            } else {
-                hasNew = true;
-            }
+            if (hasInProgress) break;
         }
 
         if (hasInProgress || (hasDone && hasNew)) {

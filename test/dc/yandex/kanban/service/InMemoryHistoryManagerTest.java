@@ -7,7 +7,7 @@ import dc.yandex.kanban.model.TaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,7 +28,7 @@ class InMemoryHistoryManagerTest {
         manager.add(task);
         manager.add(epic);
         manager.add(subTask);
-        ArrayList<Task> history = manager.getHistory();
+        List<Task> history = manager.getHistory();
 
         assertNotNull(history, "В истории null");
         assertEquals(3, history.size(), "Задачи не добавлены в историю.");
@@ -44,7 +44,7 @@ class InMemoryHistoryManagerTest {
         Task updatedTask = new Task(1, "Задача 1 обновл", "Описание 1 обновл");
         updatedTask.setStatus(TaskStatus.IN_PROGRESS);
         manager.add(updatedTask);
-        ArrayList<Task> history = manager.getHistory();
+        List<Task> history = manager.getHistory();
 
         assertEquals("Задача 1", history.get(0).getName());
         assertEquals("Описание 1", history.get(0).getDescription());
