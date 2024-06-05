@@ -1,181 +1,66 @@
 package dc.yandex.kanban.service;
 
-import dc.yandex.kanban.model.Task;
-import dc.yandex.kanban.model.SubTask;
 import dc.yandex.kanban.model.Epic;
+import dc.yandex.kanban.model.SubTask;
+import dc.yandex.kanban.model.Task;
 
-import java.util.HashMap;
 import java.util.ArrayList;
 
-public class TaskManager {
-
-    private final HashMap<Integer, Task> taskList; // Список всех обычных задач
-    private final HashMap<Integer, Epic> epicList; // Список всех эпиков
-    private final HashMap<Integer, SubTask> subTaskList; // Список всех подзадач
-
-    private int taskCounter; // Счетчик для id задач,эпиков и подзадач
-
-    public TaskManager () {
-        taskList = new HashMap<>();
-        epicList = new HashMap<>();
-        subTaskList = new HashMap<>();
-        taskCounter = 0;
-    }
+public interface TaskManager {
 
     // Получает список всех обычных задач
-    public ArrayList<Task> getTasks() {
-        return new ArrayList<>(taskList.values());
-    }
+    ArrayList<Task> getTasks();
 
     // Получает список всех эпиков
-    public ArrayList<Epic> getEpics() {
-        return new ArrayList<>(epicList.values());
-    }
+    ArrayList<Epic> getEpics();
 
     // Получает список всех подзадач
-    public ArrayList<SubTask> getSubTasks() {
-        return new ArrayList<>(subTaskList.values());
-    }
+    ArrayList<SubTask> getSubTasks();
 
     // Получает список всех подзадач эпика по id эпика
-    public ArrayList<SubTask> getEpicSubTasksById(int epicId) {
-        if (epicList.containsKey(epicId)) {
-            Epic epic = epicList.get(epicId);
-            return epic.getSubTasks();
-        } else {
-            System.out.println("Эпик с id " + epicId + " не существует");
-            return null;
-        }
-    }
+    ArrayList<SubTask> getEpicSubTasksById(int epicId);
 
     // Получает задачу, эпик или подзадачу по переданному id
-    public Task getTaskById (int taskId) {
-        if (taskList.containsKey(taskId)) {
-            return taskList.get(taskId);
-        } else if (subTaskList.containsKey(taskId)) {
-            return subTaskList.get(taskId);
-        } else if (epicList.containsKey(taskId)) {
-            return epicList.get(taskId);
-        } else {
-            System.out.println("Задачи с id " + taskId + " не найдено");
-        }
-        return null;
-    }
+    Task getTaskById(int taskId);
 
     // Удаляет задачу, эпик или подзадачу по переданному id
-    public void deleteTaskById (int taskId) {
-        if (taskList.containsKey(taskId)) {
-            taskList.remove(taskId);
-        } else if (subTaskList.containsKey(taskId)) {
-            // Получаем подзадачу, eё эпик, удаляем подзадачу в эпике, затем в списке.
-            SubTask subTask = subTaskList.get(taskId);
-            Epic epic = subTask.getParentTask();
-            epic.deleteSubTask(subTask);
-            subTaskList.remove(taskId);
-        } else if (epicList.containsKey(taskId)) {
-            // Получаем эпик, удаляем все подзадачи эпика в списке, затем удаляем подзадачи в эпике.
-            Epic epic = epicList.get(taskId);
-            ArrayList<SubTask> epicSubTasks = epic.getSubTasks();
-            for (SubTask subTask : epicSubTasks) {
-                subTaskList.remove(subTask.getId());
-            }
-            epic.deleteAllSubTasks();
-            epicList.remove(taskId);
-        } else {
-            System.out.println("Попытка удаления несуществующей задачи с id " + taskId);
-        }
-    }
+    void deleteTaskById(int taskId);
 
     // Удаляет все задачи
-    public void deleteAllTasks() {
-        taskList.clear();
-    }
+    void deleteAllTasks();
 
     // Удаляет все подзадачи
-    public void deleteAllSubTasks() {
-        for (Epic epic : epicList.values()) {
-            epic.deleteAllSubTasks();
-        }
-        subTaskList.clear();
-    }
+    void deleteAllSubTasks();
 
     // Удаляет все эпики (вместе с подзадачами)
-    public void deleteAllEpics() {
-        epicList.clear();
-        subTaskList.clear();
-    }
+    void deleteAllEpics();
 
     // Создает новый объект Task
-    public Task createNewTask(String name, String description) {
-        taskCounter++;
-        return new Task(taskCounter, name, description);
-    }
+    Task createNewTask(String name, String description);
 
     // Создает новый объект Epic
-    public Epic createNewEpic(String name, String description) {
-        taskCounter++;
-        return new Epic(taskCounter, name, description);
-    }
+    Epic createNewEpic(String name, String description);
 
     // Создает новый объект SubTask
-    public SubTask createNewSubtask(Epic epic, String name, String description) {
-        taskCounter++;
-        return new SubTask(epic, taskCounter, name, description);
-    }
+    SubTask createNewSubtask(Epic epic, String name, String description);
 
     // Добавляет задачу в список
-    public void addTask(Task task) {
-        if (task != null) {
-            taskList.put(task.getId(), task);
-        } else {
-            System.out.println("Попытка добавить null в качестве задачи.");
-        }
-    }
+    void addTask(Task task);
 
     // Добавляет эпик в список
-    public void addEpic(Epic epic) {
-        if (epic != null) {
-            epicList.put(epic.getId(), epic);
-        } else {
-            System.out.println("Попытка добавить null в качестве эпика.");
-        }
-    }
+    void addEpic(Epic epic);
 
     // Добавляет подзадачу в список
-    public void addSubTask(SubTask subTask) {
-        if (subTask != null) {
-            subTaskList.put(subTask.getId(), subTask);
-            subTask.getParentTask().addSubTask(subTask);
-        } else {
-            System.out.println("Попытка добавить подзадачу null");
-        }
-    }
+    void addSubTask(SubTask subTask);
 
     // Обновляет задачу
-    public void updateTask(Task task) {
-        if (task != null) {
-            taskList.put(task.getId(), task);
-        } else {
-            System.out.println("Попытка добавить задачу null");
-        }
-
-    }
+    void updateTask(Task task);
 
     // Обновляет эпик
-    public void updateEpic(Epic epic) {
-        if (epic != null) {
-            epicList.put(epic.getId(), epic);
-        } else {
-            System.out.println("Попытка добавить эпик null");
-        }
-    }
+    void updateEpic(Epic epic);
 
     // Обновляет подзадачу
-    public void updateSubTask(SubTask subTask) {
-        if (subTask != null) {
-            subTaskList.put(subTask.getId(), subTask);
-        } else {
-            System.out.println("Попытка добавить подзадачу null");
-        }
-    }
+    void updateSubTask(SubTask subTask);
+
+    ArrayList<Task> getHistory();
 }

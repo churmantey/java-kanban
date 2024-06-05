@@ -9,7 +9,7 @@ public class Main {
 
         System.out.println("Поехали!");
 
-        TaskManager taskManager = new TaskManager();
+        TaskManager taskManager = Managers.getDefault();
 
         Task task1 = taskManager.createNewTask("Почитать",
                 "Прочитать главу из книги Дж. Оруэлла '1984'");
@@ -36,6 +36,9 @@ public class Main {
 
         System.out.println("=== Получение задачи по идентификатору :");
         System.out.println(taskManager.getTaskById(epic1.getId()));
+
+        System.out.println("=== Получение истории просмотров :");
+        System.out.println(taskManager.getHistory());
 
         task1.setStatus(TaskStatus.IN_PROGRESS);
         taskManager.updateTask(task1);
