@@ -76,26 +76,26 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteTaskById(int taskId) {
         if (taskList.containsKey(taskId)) {
-            taskList.remove(taskId);
             historyManager.remove(taskId);
+            taskList.remove(taskId).clearData();
         } else if (subTaskList.containsKey(taskId)) {
             // Получаем подзадачу, eё эпик, удаляем подзадачу в эпике, затем в списке.
             SubTask subTask = subTaskList.get(taskId);
             Epic epic = subTask.getParentTask();
             epic.deleteSubTask(subTask);
-            subTaskList.remove(taskId);
             historyManager.remove(taskId);
+            subTaskList.remove(taskId).clearData();
         } else if (epicList.containsKey(taskId)) {
             // Получаем эпик, удаляем все подзадачи эпика в списке, затем удаляем подзадачи в эпике.
             Epic epic = epicList.get(taskId);
             ArrayList<SubTask> epicSubTasks = epic.getSubTasks();
             for (SubTask subTask : epicSubTasks) {
-                subTaskList.remove(subTask.getId());
                 historyManager.remove(subTask.getId());
+                subTaskList.remove(subTask.getId()).clearData();
             }
             epic.deleteAllSubTasks();
-            epicList.remove(taskId);
             historyManager.remove(taskId);
+            epicList.remove(taskId).clearData();
         } else {
             System.out.println("Попытка удаления несуществующей задачи с id " + taskId);
         }
@@ -106,6 +106,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteAllTasks() {
         for (Task task : taskList.values()) {
             historyManager.remove(task.getId());
+            task.clearData();
         }
         taskList.clear();
     }
@@ -118,6 +119,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         for (SubTask subTask : subTaskList.values()) {
             historyManager.remove(subTask.getId());
+            subTask.clearData();
         }
         subTaskList.clear();
     }
@@ -128,6 +130,7 @@ public class InMemoryTaskManager implements TaskManager {
         deleteAllSubTasks();
         for (Epic epic : epicList.values()) {
             historyManager.remove(epic.getId());
+            epic.clearData();
         }
         epicList.clear();
     }
