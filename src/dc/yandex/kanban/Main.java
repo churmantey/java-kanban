@@ -69,7 +69,7 @@ public class Main {
 
     }
 
-    public static void printAllTasks (TaskManager taskManager, String header) {
+    public static void printAllTasks(TaskManager taskManager, String header) {
         System.out.println("==== " + header + " ====");
         System.out.println("Задачи:");
         System.out.println(taskManager.getTasks());
@@ -79,7 +79,7 @@ public class Main {
         System.out.println(taskManager.getSubTasks());
     }
 
-    public static void printHistory (TaskManager taskManager, String header) {
+    public static void printHistory(TaskManager taskManager, String header) {
         List<Task> history = taskManager.getHistory();
         System.out.println(".... " + header + " ....");
         System.out.println("Размер: " + history.size());
