@@ -3,7 +3,7 @@ package dc.yandex.kanban.model;
 import java.util.HashMap;
 import java.util.ArrayList;
 
-public class Epic extends Task{
+public class Epic extends Task {
 
     private final HashMap<Integer, SubTask> subTasks; // Список подзадач эпика
 
@@ -21,7 +21,7 @@ public class Epic extends Task{
     }
 
     // Удаляет одну подзадачу эпика
-    public void deleteSubTask (SubTask subTask) {
+    public void deleteSubTask(SubTask subTask) {
         if (subTask != null) {
             subTasks.remove(subTask.getId());
             updateStatus();
@@ -29,7 +29,7 @@ public class Epic extends Task{
     }
 
     // Удаляет все подзадачи эпика
-    public void deleteAllSubTasks () {
+    public void deleteAllSubTasks() {
         subTasks.clear();
         updateStatus();
     }
