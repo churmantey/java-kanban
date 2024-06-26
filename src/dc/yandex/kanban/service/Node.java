@@ -3,40 +3,42 @@
 */
 package dc.yandex.kanban.service;
 
+import dc.yandex.kanban.model.Task;
+
 import java.util.Objects;
 
-public class Node<T> {
-    Node<? extends T> prev; // ссылка на предыдущий узел
-    Node<? extends T> next; // ссылка на следующий узел
-    T value; // хранимое значение
+public class Node {
+    Node prev; // ссылка на предыдущий узел
+    Node next; // ссылка на следующий узел
+    Task value; // хранимое значение
 
-    public Node(Node<? extends T> prev, Node<? extends T> next, T value) {
+    public Node(Node prev, Node next, Task value) {
         this.prev = prev;
         this.next = next;
         this.value = value;
     }
 
-    public Node<? extends T> getPrev() {
+    public Node getPrev() {
         return prev;
     }
 
-    public void setPrev(Node<? extends T> prev) {
+    public void setPrev(Node prev) {
         this.prev = prev;
     }
 
-    public Node<? extends T> getNext() {
+    public Node getNext() {
         return next;
     }
 
-    public void setNext(Node<? extends T> next) {
+    public void setNext(Node next) {
         this.next = next;
     }
 
-    public T getValue() {
+    public Task getValue() {
         return value;
     }
 
-    public void setValue(T value) {
+    public void setValue(Task value) {
         this.value = value;
     }
 
@@ -44,15 +46,15 @@ public class Node<T> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Node<? extends T> node = (Node<? extends T>) o;
+        Node node = (Node) o;
         return node.getValue().equals(this.getValue())
-                && node.prev == this.prev
-                && node.next == this.next;
+                && node.getPrev() == this.getPrev()
+                && node.getNext() == this.getNext();
     }
 
     @Override
     public int hashCode() {
-        int hash = 17 * Objects.hash(prev, next);
+        int hash = 17 * Objects.hash(getPrev(), getNext());
         if (value != null) hash += 31 * value.hashCode();
         hash = hash * 31;
 
