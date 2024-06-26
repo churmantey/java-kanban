@@ -84,4 +84,9 @@ public class Epic extends Task{
                 '}';
     }
 
+    @Override
+    public void clearData() {
+        super.clearData();
+        subTasks.clear();
+    }
 }

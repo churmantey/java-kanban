@@ -13,7 +13,6 @@ public class InMemoryHistoryManager implements HistoryManager {
 
 
     public InMemoryHistoryManager() {
-        //taskHistory = new LinkedList<>();
         taskHistoryMap = new HashMap<>();
         head = null;
         tail = null;
@@ -61,10 +60,10 @@ public class InMemoryHistoryManager implements HistoryManager {
         Node nextNode = node.getNext();
 
         // перекидываем ссылки в соседних узлах
-        if (prevNode !=null) {
+        if (prevNode != null) {
             prevNode.setNext(nextNode);
         }
-        if (nextNode !=null) {
+        if (nextNode != null) {
             nextNode.setPrev(prevNode);
         }
 
@@ -81,6 +80,9 @@ public class InMemoryHistoryManager implements HistoryManager {
         Node newNode = new Node(tail, null, task);
         if (head == null) {
             head = newNode;
+        }
+        if (tail != null) {
+            tail.setNext(newNode);
         }
         tail = newNode;
 
