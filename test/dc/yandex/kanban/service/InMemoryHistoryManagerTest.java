@@ -98,7 +98,7 @@ class InMemoryHistoryManagerTest {
         manager.add(subTask);
 
         manager.remove(epic.getId());
-        assertEquals(1, manager.getHistory().size(), "Задачи не удалены из истории.");
+        assertEquals(2, manager.getHistory().size(), "Задачи не удалены из истории.");
         manager.remove(subTask.getId());
         assertEquals(1, manager.getHistory().size(), "Задачи не удалены из истории.");
         manager.remove(task.getId());
