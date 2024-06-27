@@ -14,21 +14,25 @@ import static org.junit.jupiter.api.Assertions.*;
 class InMemoryHistoryManagerTest {
 
     private HistoryManager manager;
+    private Task task;
+    private Epic epic;
+    private SubTask subTask;
+    private List<Task> history;
 
     @BeforeEach
     public void beforeEach() {
         manager = new InMemoryHistoryManager();
+        task = new Task(1, "Задача 1", "Описание 1");
+        epic = new Epic(2, "Эпик 2", "Описание 2");
+        subTask = new SubTask(epic, 3, "Подзадача 3", "Описание 3");
     }
 
     @Test
     public void shouldAddHistoryAndCheckHistory() {
-        Task task = new Task(1, "Задача 1", "Описание 1");
-        Epic epic = new Epic(2, "Эпик 2", "Описание 2");
-        SubTask subTask = new SubTask(epic, 3, "Подзадача 3", "Описание 3");
         manager.add(task);
         manager.add(epic);
         manager.add(subTask);
-        List<Task> history = manager.getHistory();
+        history = manager.getHistory();
 
         assertNotNull(history, "В истории null");
         assertEquals(3, history.size(), "Задачи не добавлены в историю.");
@@ -39,9 +43,8 @@ class InMemoryHistoryManagerTest {
 
     @Test
     public void shouldPreserveTaskData() {
-        Task task = new Task(1, "Задача 1", "Описание 1");
         manager.add(task);
-        List<Task> history = manager.getHistory();
+        history = manager.getHistory();
 
         assertEquals("Задача 1", history.get(0).getName());
         assertEquals("Описание 1", history.get(0).getDescription());
@@ -61,9 +64,6 @@ class InMemoryHistoryManagerTest {
     }
     @Test
     public void shouldContainUniqueValuesInHistory() {
-        Task task = new Task(1, "Задача 1", "Описание 1");
-        Epic epic = new Epic(2, "Эпик 2", "Описание 2");
-        SubTask subTask = new SubTask(epic, 3, "Подзадача 3", "Описание 3");
         manager.add(task);
         manager.add(epic);
         manager.add(subTask);
@@ -73,7 +73,7 @@ class InMemoryHistoryManagerTest {
         manager.add(task);
         manager.add(epic);
         manager.add(subTask);
-        List<Task> history = manager.getHistory();
+        history = manager.getHistory();
 
         assertNotNull(history, "В истории null");
         assertEquals(3, history.size(), "Задачи не добавлены в историю.");
@@ -84,9 +84,6 @@ class InMemoryHistoryManagerTest {
 
     @Test
     public void shouldRemoveFromHistory() {
-        Task task = new Task(1, "Задача 1", "Описание 1");
-        Epic epic = new Epic(2, "Эпик 2", "Описание 2");
-        SubTask subTask = new SubTask(epic, 3, "Подзадача 3", "Описание 3");
         manager.add(task);
         manager.add(epic);
         manager.add(subTask);
@@ -103,7 +100,6 @@ class InMemoryHistoryManagerTest {
         assertEquals(1, manager.getHistory().size(), "Задачи не удалены из истории.");
         manager.remove(task.getId());
         assertEquals(0, manager.getHistory().size(), "Задачи не удалены из истории.");
-
     }
 
 }
