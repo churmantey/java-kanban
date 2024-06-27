@@ -10,4 +10,7 @@ public interface HistoryManager {
 
     // Добавляет задачу в список истории просмотров
     void add(Task task);
+
+    // Удаляет задачу по id из истории просмотров
+    void remove(int id);
 }

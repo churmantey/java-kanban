@@ -3,6 +3,8 @@ package dc.yandex.kanban;
 import dc.yandex.kanban.model.*;
 import dc.yandex.kanban.service.*;
 
+import java.util.List;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -13,62 +15,49 @@ public class Main {
 
         Task task1 = taskManager.createNewTask("Почитать",
                 "Прочитать главу из книги Дж. Оруэлла '1984'");
-        taskManager.addTask(task1);
         Task task2 = taskManager.createNewTask("Позаниматься музыкой",
                 "Выучить 'Cullen Bay'");
+        taskManager.addTask(task1);
         taskManager.addTask(task2);
+        printAllTasks(taskManager, "Добавлены 2 задачи");
 
         Epic epic1 = taskManager.createNewEpic("Двухэтажный дом", "Нужен двухэтажный кирпичный");
-        taskManager.addEpic(epic1);
         SubTask subTask1e1 = taskManager.createNewSubtask(epic1, "Основание", "Заложить фундамент");
-        taskManager.addSubTask(subTask1e1);
         SubTask subTask2e1 = taskManager.createNewSubtask(epic1, "Стены", "Возвести стены");
+        SubTask subTask3e1 = taskManager.createNewSubtask(epic1, "Кровля", "Уложить кровлю");
+        taskManager.addEpic(epic1);
+        taskManager.addSubTask(subTask1e1);
         taskManager.addSubTask(subTask2e1);
+        taskManager.addSubTask(subTask3e1);
+        printAllTasks(taskManager, "Добавлен эпик с 3-мя подзадачами");
 
         Epic epic2 = taskManager.createNewEpic("Запастить продуктами", "В доме нужна еда");
         taskManager.addEpic(epic2);
-        SubTask subTask1e2 = taskManager.createNewSubtask(epic2, "Купить сыр", "Упаковку моцареллы и кусок чеддера");
-        taskManager.addSubTask(subTask1e2);
-        printAllTasks(taskManager, " Созданы новые задачи, эпики и подзадачи");
+        printAllTasks(taskManager, "Добавлен эпик без подзадач");
 
-        System.out.println("=== Получение списка подзадач эпика 2 по id:");
-        System.out.println(taskManager.getEpicSubTasksById(epic2.getId()));
-
-        System.out.println("=== Получение задачи по идентификатору :");
-        System.out.println(taskManager.getTaskById(epic1.getId()));
-
-        System.out.println("=== Получение истории просмотров после 12 попаданий:");
-        taskManager.getTaskById(epic2.getId());
-        taskManager.getTaskById(epic2.getId());
-        taskManager.getTaskById(epic2.getId());
-        taskManager.getTaskById(epic2.getId());
+        taskManager.getTaskById(task1.getId());
+        taskManager.getTaskById(task2.getId());
         taskManager.getTaskById(epic1.getId());
+        printHistory(taskManager, "История после 3 уникальных попаданий");
+
+        taskManager.getTaskById(task1.getId());
+        taskManager.getTaskById(task2.getId());
+        taskManager.getTaskById(epic1.getId());
+        taskManager.getTaskById(subTask2e1.getId());
+        taskManager.getTaskById(task1.getId());
+        taskManager.getTaskById(task2.getId());
         taskManager.getTaskById(epic1.getId());
         taskManager.getTaskById(epic2.getId());
-        taskManager.getTaskById(subTask1e1.getId());
-        taskManager.getTaskById(subTask1e2.getId());
-        taskManager.getTaskById(epic2.getId());
-        taskManager.getTaskById(epic2.getId());
-        taskManager.getTaskById(epic2.getId());
-        System.out.println("Размер списка истории: " + taskManager.getHistory().size());
-        System.out.println(taskManager.getHistory());
+        taskManager.getTaskById(subTask3e1.getId());
+        printHistory(taskManager, "История после еще 6 дублей и 3 уникальных запросов");
 
-        task1.setStatus(TaskStatus.IN_PROGRESS);
-        taskManager.updateTask(task1);
-        subTask1e1.setStatus(TaskStatus.DONE);
-        taskManager.updateSubTask(subTask1e1);
-        subTask1e2.setStatus(TaskStatus.DONE);
-        taskManager.updateSubTask(subTask1e2);
-        epic2.setName("Запастись продуктами к празднику");
-        epic2.setDescription("Будет много гостей, в доме нужна еда.");
-        taskManager.updateEpic(epic2);
-        printAllTasks(taskManager, "Изменены статусы задачи и подзадач эпиков, имя и описание эпика 2");
-
-        taskManager.deleteTaskById(subTask1e2.getId());
-        printAllTasks(taskManager, "Удалена единственная подзадача эпика 2");
+        taskManager.deleteTaskById(subTask3e1.getId());
+        printAllTasks(taskManager, "Удалена одна подзадача эпика");
+        printHistory(taskManager, "История после удаления одной подзадачи");
 
         taskManager.deleteTaskById(epic1.getId());
         printAllTasks(taskManager, "Удален эпик 1");
+        printHistory(taskManager, "История после удаления эпика с подзадачами");
 
         taskManager.deleteAllTasks();
         printAllTasks(taskManager, "Удалены все задачи");
@@ -76,17 +65,25 @@ public class Main {
         printAllTasks(taskManager, "Удалены все подзадачи");
         taskManager.deleteAllEpics();
         printAllTasks(taskManager, "Удалены все эпики");
+        printHistory(taskManager, "История после удаления всех эпиков/задач/подзадач");
 
     }
 
-    public static void printAllTasks (TaskManager taskManager, String header) {
-        System.out.println("=== " + header + " ==============");
+    public static void printAllTasks(TaskManager taskManager, String header) {
+        System.out.println("==== " + header + " ====");
         System.out.println("Задачи:");
         System.out.println(taskManager.getTasks());
         System.out.println("Эпики:");
         System.out.println(taskManager.getEpics());
         System.out.println("Подзадачи:");
         System.out.println(taskManager.getSubTasks());
+    }
+
+    public static void printHistory(TaskManager taskManager, String header) {
+        List<Task> history = taskManager.getHistory();
+        System.out.println(".... " + header + " ....");
+        System.out.println("Размер: " + history.size());
+        System.out.println("История:\n" + history);
     }
 
 }
