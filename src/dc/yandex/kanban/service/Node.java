@@ -8,9 +8,9 @@ import dc.yandex.kanban.model.Task;
 import java.util.Objects;
 
 public class Node {
-    Node prev; // ссылка на предыдущий узел
-    Node next; // ссылка на следующий узел
-    Task value; // хранимое значение
+    private Node prev; // ссылка на предыдущий узел
+    private Node next; // ссылка на следующий узел
+    private Task value; // хранимое значение
 
     public Node(Node prev, Node next, Task value) {
         this.prev = prev;

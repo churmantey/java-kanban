@@ -1,6 +1,7 @@
 package dc.yandex.kanban.service;
 
 import dc.yandex.kanban.model.Task;
+
 import java.util.List;
 
 public interface HistoryManager {

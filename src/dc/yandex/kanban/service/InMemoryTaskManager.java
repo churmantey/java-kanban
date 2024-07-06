@@ -1,10 +1,13 @@
 package dc.yandex.kanban.service;
 
-import dc.yandex.kanban.model.Task;
-import dc.yandex.kanban.model.SubTask;
 import dc.yandex.kanban.model.Epic;
+import dc.yandex.kanban.model.SubTask;
+import dc.yandex.kanban.model.Task;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
 
@@ -60,7 +63,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (taskList.containsKey(taskId)) {
             foundTask = taskList.get(taskId);
         } else if (subTaskList.containsKey(taskId)) {
-            foundTask =  subTaskList.get(taskId);
+            foundTask = subTaskList.get(taskId);
         } else if (epicList.containsKey(taskId)) {
             foundTask = epicList.get(taskId);
         } else {

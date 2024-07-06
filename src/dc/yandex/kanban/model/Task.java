@@ -18,8 +18,6 @@ public class Task {
     // Очищает данные задачи (при удалении)
     public void clearData() {
         id = 0;
-        setDescription("");
-        setName("");
     }
 
     public String getName() {

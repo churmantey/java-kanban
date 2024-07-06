@@ -1,7 +1,7 @@
 package dc.yandex.kanban.model;
 
-import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Epic extends Task {
 
@@ -84,9 +84,4 @@ public class Epic extends Task {
                 '}';
     }
 
-    @Override
-    public void clearData() {
-        super.clearData();
-        subTasks.clear();
-    }
 }

@@ -2,7 +2,7 @@ package dc.yandex.kanban.model;
 
 public class SubTask extends Task {
 
-    private Epic parentTask;
+    private final Epic parentTask;
 
     public SubTask(Epic parentTask, int id, String name, String description) {
         super(id, name, description);
@@ -24,7 +24,7 @@ public class SubTask extends Task {
     public String toString() {
         return getClass().getName() + "{" +
                 "id='" + super.getId() + '\'' +
-                ",epic_id='" + ((parentTask == null) ? "null" : parentTask.getId()) + '\'' +
+                ",epic_id='" + parentTask.getId() + '\'' +
                 ", status='" + super.getStatus() + '\'' +
                 ", name='" + super.getName() + '\'' +
                 ", description='" + super.getDescription() + '\'' +
@@ -34,6 +34,5 @@ public class SubTask extends Task {
     @Override
     public void clearData() {
         super.clearData();
-        parentTask = null;
     }
 }
