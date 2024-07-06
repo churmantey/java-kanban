@@ -3,7 +3,7 @@ package dc.yandex.kanban.model;
 import java.util.Objects;
 
 public class Task {
-    private final int id;
+    private int id;
     private String name;
     private String description;
     private TaskStatus status;
@@ -13,6 +13,11 @@ public class Task {
         this.name = name;
         this.description = description;
         this.status = TaskStatus.NEW;
+    }
+
+    // Очищает данные задачи (при удалении)
+    public void clearData() {
+        id = 0;
     }
 
     public String getName() {

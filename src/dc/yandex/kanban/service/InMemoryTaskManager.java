@@ -1,10 +1,13 @@
 package dc.yandex.kanban.service;
 
-import dc.yandex.kanban.model.Task;
-import dc.yandex.kanban.model.SubTask;
 import dc.yandex.kanban.model.Epic;
+import dc.yandex.kanban.model.SubTask;
+import dc.yandex.kanban.model.Task;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
 
@@ -60,7 +63,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (taskList.containsKey(taskId)) {
             foundTask = taskList.get(taskId);
         } else if (subTaskList.containsKey(taskId)) {
-            foundTask =  subTaskList.get(taskId);
+            foundTask = subTaskList.get(taskId);
         } else if (epicList.containsKey(taskId)) {
             foundTask = epicList.get(taskId);
         } else {
@@ -76,22 +79,26 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteTaskById(int taskId) {
         if (taskList.containsKey(taskId)) {
-            taskList.remove(taskId);
+            historyManager.remove(taskId);
+            taskList.remove(taskId).clearData();
         } else if (subTaskList.containsKey(taskId)) {
             // Получаем подзадачу, eё эпик, удаляем подзадачу в эпике, затем в списке.
             SubTask subTask = subTaskList.get(taskId);
             Epic epic = subTask.getParentTask();
             epic.deleteSubTask(subTask);
-            subTaskList.remove(taskId);
+            historyManager.remove(taskId);
+            subTaskList.remove(taskId).clearData();
         } else if (epicList.containsKey(taskId)) {
             // Получаем эпик, удаляем все подзадачи эпика в списке, затем удаляем подзадачи в эпике.
             Epic epic = epicList.get(taskId);
             ArrayList<SubTask> epicSubTasks = epic.getSubTasks();
             for (SubTask subTask : epicSubTasks) {
-                subTaskList.remove(subTask.getId());
+                historyManager.remove(subTask.getId());
+                subTaskList.remove(subTask.getId()).clearData();
             }
             epic.deleteAllSubTasks();
-            epicList.remove(taskId);
+            historyManager.remove(taskId);
+            epicList.remove(taskId).clearData();
         } else {
             System.out.println("Попытка удаления несуществующей задачи с id " + taskId);
         }
@@ -100,6 +107,10 @@ public class InMemoryTaskManager implements TaskManager {
     // Удаляет все задачи
     @Override
     public void deleteAllTasks() {
+        for (Task task : taskList.values()) {
+            historyManager.remove(task.getId());
+            task.clearData();
+        }
         taskList.clear();
     }
 
@@ -109,14 +120,22 @@ public class InMemoryTaskManager implements TaskManager {
         for (Epic epic : epicList.values()) {
             epic.deleteAllSubTasks();
         }
+        for (SubTask subTask : subTaskList.values()) {
+            historyManager.remove(subTask.getId());
+            subTask.clearData();
+        }
         subTaskList.clear();
     }
 
     // Удаляет все эпики (вместе с подзадачами)
     @Override
     public void deleteAllEpics() {
+        deleteAllSubTasks();
+        for (Epic epic : epicList.values()) {
+            historyManager.remove(epic.getId());
+            epic.clearData();
+        }
         epicList.clear();
-        subTaskList.clear();
     }
 
     // Создает новый объект Task
@@ -205,8 +224,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Возвращает список истории просмотренных задач
     @Override
-    public LinkedList<Task> getHistory() {
-        return (LinkedList<Task>) historyManager.getHistory();
+    public List<Task> getHistory() {
+        return historyManager.getHistory();
     }
 
 }

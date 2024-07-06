@@ -1,6 +1,6 @@
 package dc.yandex.kanban.model;
 
-public class SubTask extends Task{
+public class SubTask extends Task {
 
     private final Epic parentTask;
 
@@ -31,4 +31,8 @@ public class SubTask extends Task{
                 '}';
     }
 
+    @Override
+    public void clearData() {
+        super.clearData();
+    }
 }

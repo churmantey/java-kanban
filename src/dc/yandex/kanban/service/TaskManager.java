@@ -4,7 +4,6 @@ import dc.yandex.kanban.model.Epic;
 import dc.yandex.kanban.model.SubTask;
 import dc.yandex.kanban.model.Task;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public interface TaskManager {
@@ -63,5 +62,5 @@ public interface TaskManager {
     // Обновляет подзадачу
     void updateSubTask(SubTask subTask);
 
-    LinkedList<Task> getHistory();
+    List<Task> getHistory();
 }
