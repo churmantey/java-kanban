@@ -63,4 +63,7 @@ public interface TaskManager {
     void updateSubTask(SubTask subTask);
 
     List<Task> getHistory();
+
+    // Очищает историю просмотров
+    void clearHistory();
 }

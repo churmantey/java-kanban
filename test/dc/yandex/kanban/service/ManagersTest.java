@@ -1,12 +1,14 @@
 package dc.yandex.kanban.service;
 
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class ManagersTest {
 
     @Test
-    public void shouldReturnInitializedTaskManager(){
+    public void shouldReturnInitializedTaskManager() {
         TaskManager taskManager = Managers.getDefault();
 
         assertNotNull(taskManager);
@@ -16,9 +18,9 @@ class ManagersTest {
     }
 
     @Test
-    public void shouldReturnInitializedHistoryManager(){
+    public void shouldReturnInitializedHistoryManager() {
         HistoryManager manager = Managers.getDefaultHistory();
         assertNotNull(manager);
         assertEquals(0, manager.getHistory().size());
-     }
+    }
 }
