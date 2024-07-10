@@ -89,4 +89,10 @@ public class InMemoryHistoryManager implements HistoryManager {
         return newNode;
     }
 
+    @Override
+    public void clearHistory() {
+        for (int taskId : taskHistoryMap.keySet()) {
+            remove(taskId);
+        }
+    }
 }

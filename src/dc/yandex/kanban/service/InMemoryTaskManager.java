@@ -26,6 +26,11 @@ public class InMemoryTaskManager implements TaskManager {
         historyManager = Managers.getDefaultHistory();
     }
 
+    // Устанавливает счетчик для id задач
+    public void setTaskCounter(int taskCounter) {
+        this.taskCounter = taskCounter;
+    }
+
     // Получает список всех обычных задач
     @Override
     public List<Task> getTasks() {
@@ -228,4 +233,8 @@ public class InMemoryTaskManager implements TaskManager {
         return historyManager.getHistory();
     }
 
+    @Override
+    public void clearHistory() {
+        historyManager.clearHistory();
+    }
 }
