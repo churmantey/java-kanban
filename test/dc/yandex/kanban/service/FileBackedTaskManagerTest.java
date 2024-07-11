@@ -20,6 +20,9 @@ public class FileBackedTaskManagerTest {
 
     private TaskManager manager;
     private File tmpFile;
+    private Task task, taskFromManager, updatedTask;
+    private Epic epic, epicFromManager, updatedEpic;
+    private SubTask subTask, subTaskFromManager, updatedSubTask;
 
     @BeforeEach
     public void beforeEach() {
@@ -30,13 +33,19 @@ public class FileBackedTaskManagerTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        task = new Task(1, "Задача 1", "Описание 1");
+        updatedTask = new Task(1, "Задача 1 Новое", "Описание 1 Новое");
+        epic = new Epic(2, "Эпик 1", "Описание эпика 1");
+        updatedEpic = new Epic(2, "Эпик 1 Новое", "Описание эпика 1 Новое");
+        subTask = new SubTask(epic, 3, "Подзадача 1 эпика 1", "Описание подзадачи 1");
+        updatedSubTask = new SubTask(epic, 3, "Подзадача 1 эпика 1 обновленная",
+                "Описание подзадачи 1 обновленное");
     }
 
     @Test
     public void shouldAddTaskAndCheckFields() {
-        Task task = new Task(1, "Задача 1", "Описание 1");
         manager.addTask(task);
-        Task taskFromManager = manager.getTaskById(1);
+        taskFromManager = manager.getTaskById(1);
         List<Task> taskList = manager.getTasks();
 
         assertNotNull(taskFromManager, "Задача не найдена.");
@@ -49,9 +58,8 @@ public class FileBackedTaskManagerTest {
 
     @Test
     public void shouldAddEpicAndCheckFields() {
-        Epic epic = new Epic(1, "Эпик 1", "Описание эпика 1");
         manager.addEpic(epic);
-        Task epicFromManager = manager.getTaskById(1);
+        epicFromManager = (Epic) manager.getTaskById(2);
         List<Epic> taskList = manager.getEpics();
 
         assertNotNull(epicFromManager, "Эпик не найден.");
@@ -64,10 +72,8 @@ public class FileBackedTaskManagerTest {
 
     @Test
     public void shouldAddSubtaskAndCheckFields() {
-        Epic epic = new Epic(1, "Эпик 1", "Описание эпика 1");
-        SubTask subTask = new SubTask(epic, 2, "Подзадача 1 эпика 1", "Описание подзадачи 1");
         manager.addSubTask(subTask);
-        Task subTaskFromManager = manager.getTaskById(2);
+        subTaskFromManager = (SubTask) manager.getTaskById(3);
         List<SubTask> taskList = manager.getSubTasks();
 
         assertNotNull(subTaskFromManager, "Подзадача не найдена.");
@@ -80,8 +86,6 @@ public class FileBackedTaskManagerTest {
 
     @Test
     public void shouldNotAddEpicAndSubtaskAsTask() {
-        Epic epic = new Epic(1, "Эпик 1", "Описание эпика 1");
-        SubTask subTask = new SubTask(epic, 2, "Подзадача 1 эпика 1", "Описание подзадачи 1");
         manager.addTask(epic);
         manager.addTask(subTask);
         List<Task> taskList = manager.getTasks();
@@ -91,12 +95,10 @@ public class FileBackedTaskManagerTest {
 
     @Test
     public void shouldUpdateTask() {
-        Task task = new Task(1, "Задача 1", "Описание 1");
         manager.addTask(task);
-        Task updatedTask = new Task(1, "Задача 1 Новое", "Описание 1 Новое");
         updatedTask.setStatus(TaskStatus.IN_PROGRESS);
         manager.updateTask(updatedTask);
-        Task taskFromManager = manager.getTaskById(1);
+        taskFromManager = manager.getTaskById(1);
 
         assertEquals(updatedTask.getId(), taskFromManager.getId());
         assertEquals(updatedTask.getName(), taskFromManager.getName());
@@ -106,11 +108,9 @@ public class FileBackedTaskManagerTest {
 
     @Test
     public void shouldUpdateEpic() {
-        Epic epic = new Epic(1, "Эпик 1", "Описание эпика 1");
         manager.addEpic(epic);
-        Epic updatedEpic = new Epic(1, "Эпик 1 Новое", "Описание эпика 1 Новое");
         manager.updateEpic(updatedEpic);
-        Task epicFromManager = manager.getTaskById(1);
+        epicFromManager = (Epic) manager.getTaskById(2);
 
         assertEquals(updatedEpic.getId(), epicFromManager.getId());
         assertEquals(updatedEpic.getName(), epicFromManager.getName());
@@ -119,18 +119,14 @@ public class FileBackedTaskManagerTest {
 
     @Test
     public void shouldUpdateSubTask() {
-        Epic epic = new Epic(1, "Эпик 1", "Описание эпика 1");
-        SubTask subTask = new SubTask(epic, 2, "Подзадача 1 эпика 1", "Описание подзадачи 1");
         manager.addEpic(epic);
         manager.addSubTask(subTask);
-        SubTask updatedSubTask = new SubTask(epic, 2, "Подзадача 1 эпика 1 обновленная",
-                "Описание подзадачи 1 обновленное");
         updatedSubTask.setStatus(TaskStatus.IN_PROGRESS);
         epic.addSubTask(updatedSubTask);
         manager.updateSubTask(updatedSubTask);
 
-        Task epicFromManager = manager.getTaskById(1);
-        Task subTaskFromManager = manager.getTaskById(2);
+        epicFromManager = (Epic) manager.getTaskById(2);
+        subTaskFromManager = (SubTask) manager.getTaskById(3);
 
         assertEquals(updatedSubTask.getId(), subTaskFromManager.getId());
         assertEquals(updatedSubTask.getName(), subTaskFromManager.getName());
@@ -141,9 +137,7 @@ public class FileBackedTaskManagerTest {
 
     @Test
     public void shouldDeleteTask() {
-        Epic epic = new Epic(1, "Эпик 1", "Описание эпика 1");
-        SubTask subTask = new SubTask(epic, 2, "Подзадача 1 эпика 1", "Описание подзадачи 1");
-        Task task = new Task(3, "Задача 1", "Описание 1");
+        task = new Task(3, "Задача 1", "Описание 1");
         manager.addEpic(epic);
         manager.addSubTask(subTask);
         manager.addTask(task);

@@ -7,6 +7,7 @@ public class SubTask extends Task {
     public SubTask(Epic parentTask, int id, String name, String description) {
         super(id, name, description);
         this.parentTask = parentTask;
+        this.type = TaskType.SUBTASK;
     }
 
     // Получает эпик подзадачи

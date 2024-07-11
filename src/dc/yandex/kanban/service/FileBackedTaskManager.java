@@ -91,7 +91,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             writeTaskList(bufferedWriter, getEpics());
             writeTaskList(bufferedWriter, getSubTasks());
         } catch (IOException e) {
-            throw new ManagerSaveException(e);
+            throw new ManagerSaveException("Ошибка записи файла", e);
         }
     }
 
@@ -112,20 +112,25 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 int maxId = 0;
                 for (int i = 1; i < lines.size(); i++) {
                     String line = lines.get(i);
-                    if (line.isEmpty() || line.isBlank()) continue;
+                    if (line.isBlank()) continue;
                     Task task = manager.fromString(line);
                     if (task == null) continue;
-                    if (task instanceof Epic) {
-                        manager.addEpic((Epic) task);
-                    } else if (task instanceof SubTask) {
-                        manager.addSubTask((SubTask) task);
-                    } else {
-                        manager.addTask(task);
+                    switch (task.getType()) {
+                        case EPIC:
+                            manager.addEpic((Epic) task);
+                            break;
+                        case SUBTASK:
+                            manager.addSubTask((SubTask) task);
+                            break;
+                        case TASK:
+                            manager.addTask(task);
+                            break;
+                        default:
+                            System.out.println("Неизвестный тип задачи: " + task.getType());
                     }
                     maxId = Integer.max(maxId, task.getId());
                 }
                 manager.setTaskCounter(maxId);
-                manager.clearHistory();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -139,17 +144,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         if (task != null) {
             parts.add(Integer.toString(task.getId()));
-            if (task instanceof Epic) {
-                parts.add(TaskType.EPIC.name());
-            } else if (task instanceof SubTask) {
-                parts.add(TaskType.SUBTASK.name());
-            } else {
-                parts.add(TaskType.TASK.name());
-            }
+            parts.add(task.getType().name());
             parts.add(task.getName());
             parts.add(task.getStatus().name());
             parts.add(task.getDescription());
-            if (task instanceof SubTask) {
+            if (task.getType().equals(TaskType.SUBTASK)) {
                 parts.add(Integer.toString(((SubTask) task).getParentTask().getId()));
             }
             return String.join(delimiter, parts);
@@ -161,7 +160,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     // Создает задачу по ее строковому представлению
     private Task fromString(String value) {
         // Если передали null или пустую строку - разобрать не можем
-        if (value == null || value.isEmpty() || value.isBlank()) {
+        if (value == null || value.isBlank()) {
             return null;
         }
         String[] parts = value.split(delimiter);
@@ -192,50 +191,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
         task.setStatus(taskStatus);
         return task;
-    }
-
-    public static void main(String[] args) {
-
-        String testFilename = "manager_save.txt";
-        FileBackedTaskManager taskManager = new FileBackedTaskManager(testFilename);
-
-        Task task1 = taskManager.createNewTask("Почитать",
-                "Прочитать главу из книги Дж. Оруэлла '1984'");
-        Task task2 = taskManager.createNewTask("Позаниматься музыкой",
-                "Выучить 'Cullen Bay'");
-        taskManager.addTask(task1);
-        taskManager.addTask(task2);
-
-        Epic epic1 = taskManager.createNewEpic("Двухэтажный дом", "Нужен двухэтажный кирпичный");
-        SubTask subTask1e1 = taskManager.createNewSubtask(epic1, "Основание", "Заложить фундамент");
-        SubTask subTask2e1 = taskManager.createNewSubtask(epic1, "Стены", "Возвести стены");
-        SubTask subTask3e1 = taskManager.createNewSubtask(epic1, "Кровля", "Уложить кровлю");
-        taskManager.addEpic(epic1);
-        taskManager.addSubTask(subTask1e1);
-        taskManager.addSubTask(subTask2e1);
-        taskManager.addSubTask(subTask3e1);
-        subTask2e1.setStatus(TaskStatus.IN_PROGRESS);
-        taskManager.updateSubTask(subTask2e1);
-
-        Epic epic2 = taskManager.createNewEpic("Запастить продуктами", "В доме нужна еда");
-        taskManager.addEpic(epic2);
-
-        FileBackedTaskManager taskManager2 = FileBackedTaskManager.loadFromFile(new File(testFilename));
-
-        System.out.println("Задачи основного менеджера:");
-        System.out.println(taskManager.getTasks());
-        System.out.println("Задачи восстановленного менеджера:");
-        System.out.println(taskManager2.getTasks());
-
-        System.out.println("Эпики основного менеджера:");
-        System.out.println(taskManager.getEpics());
-        System.out.println("Эпики восстановленного менеджера:");
-        System.out.println(taskManager2.getEpics());
-
-        System.out.println("Подзадачи основного менеджера:");
-        System.out.println(taskManager.getSubTasks());
-        System.out.println("Подзадачи восстановленного менеджера:");
-        System.out.println(taskManager2.getSubTasks());
     }
 
 }

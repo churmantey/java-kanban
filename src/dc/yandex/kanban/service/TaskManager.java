@@ -64,6 +64,4 @@ public interface TaskManager {
 
     List<Task> getHistory();
 
-    // Очищает историю просмотров
-    void clearHistory();
 }

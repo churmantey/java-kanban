@@ -233,8 +233,4 @@ public class InMemoryTaskManager implements TaskManager {
         return historyManager.getHistory();
     }
 
-    @Override
-    public void clearHistory() {
-        historyManager.clearHistory();
-    }
 }

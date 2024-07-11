@@ -7,17 +7,23 @@ public class Task {
     private String name;
     private String description;
     private TaskStatus status;
+    protected TaskType type;
 
     public Task(int id, String name, String description) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.status = TaskStatus.NEW;
+        this.type = TaskType.TASK;
     }
 
     // Очищает данные задачи (при удалении)
     public void clearData() {
         id = 0;
+    }
+
+    public TaskType getType() {
+        return type;
     }
 
     public String getName() {
