@@ -14,4 +14,5 @@ public interface HistoryManager {
 
     // Удаляет задачу по id из истории просмотров
     void remove(int id);
+
 }

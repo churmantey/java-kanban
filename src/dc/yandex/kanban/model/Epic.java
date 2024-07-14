@@ -10,6 +10,7 @@ public class Epic extends Task {
     public Epic(int id, String name, String description) {
         super(id, name, description);
         subTasks = new HashMap<>();
+        this.type = TaskType.EPIC;
     }
 
     // Добавляет подзадачу эпика

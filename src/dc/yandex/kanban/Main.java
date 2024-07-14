@@ -3,12 +3,41 @@ package dc.yandex.kanban;
 import dc.yandex.kanban.model.*;
 import dc.yandex.kanban.service.*;
 
+import java.io.File;
 import java.util.List;
 
 public class Main {
 
     public static void main(String[] args) {
+        System.out.println("#############################");
+        System.out.println("###    InMemoryManager    ###");
+        System.out.println("#############################");
+        inMemoryMain(args);
 
+        System.out.println("#############################");
+        System.out.println("###   FileBackedManager   ###");
+        System.out.println("#############################");
+        fileBackedMain(args);
+    }
+
+    public static void printAllTasks(TaskManager taskManager, String header) {
+        System.out.println("==== " + header + " ====");
+        System.out.println("Задачи:");
+        System.out.println(taskManager.getTasks());
+        System.out.println("Эпики:");
+        System.out.println(taskManager.getEpics());
+        System.out.println("Подзадачи:");
+        System.out.println(taskManager.getSubTasks());
+    }
+
+    public static void printHistory(TaskManager taskManager, String header) {
+        List<Task> history = taskManager.getHistory();
+        System.out.println(".... " + header + " ....");
+        System.out.println("Размер: " + history.size());
+        System.out.println("История:\n" + history);
+    }
+
+    public static void inMemoryMain(String[] args) {
         System.out.println("Поехали!");
 
         TaskManager taskManager = Managers.getDefault();
@@ -69,21 +98,47 @@ public class Main {
 
     }
 
-    public static void printAllTasks(TaskManager taskManager, String header) {
-        System.out.println("==== " + header + " ====");
-        System.out.println("Задачи:");
-        System.out.println(taskManager.getTasks());
-        System.out.println("Эпики:");
-        System.out.println(taskManager.getEpics());
-        System.out.println("Подзадачи:");
-        System.out.println(taskManager.getSubTasks());
-    }
+    public static void fileBackedMain(String[] args) {
+        String testFilename = "manager_save.txt";
+        FileBackedTaskManager taskManager = new FileBackedTaskManager(testFilename);
 
-    public static void printHistory(TaskManager taskManager, String header) {
-        List<Task> history = taskManager.getHistory();
-        System.out.println(".... " + header + " ....");
-        System.out.println("Размер: " + history.size());
-        System.out.println("История:\n" + history);
+        Task task1 = taskManager.createNewTask("Почитать",
+                "Прочитать главу из книги Дж. Оруэлла '1984'");
+        Task task2 = taskManager.createNewTask("Позаниматься музыкой",
+                "Выучить 'Cullen Bay'");
+        taskManager.addTask(task1);
+        taskManager.addTask(task2);
+
+        Epic epic1 = taskManager.createNewEpic("Двухэтажный дом", "Нужен двухэтажный кирпичный");
+        SubTask subTask1e1 = taskManager.createNewSubtask(epic1, "Основание", "Заложить фундамент");
+        SubTask subTask2e1 = taskManager.createNewSubtask(epic1, "Стены", "Возвести стены");
+        SubTask subTask3e1 = taskManager.createNewSubtask(epic1, "Кровля", "Уложить кровлю");
+        taskManager.addEpic(epic1);
+        taskManager.addSubTask(subTask1e1);
+        taskManager.addSubTask(subTask2e1);
+        taskManager.addSubTask(subTask3e1);
+        subTask2e1.setStatus(TaskStatus.IN_PROGRESS);
+        taskManager.updateSubTask(subTask2e1);
+
+        Epic epic2 = taskManager.createNewEpic("Запастить продуктами", "В доме нужна еда");
+        taskManager.addEpic(epic2);
+
+        FileBackedTaskManager taskManager2 = FileBackedTaskManager.loadFromFile(new File(testFilename));
+
+        System.out.println("Задачи основного менеджера:");
+        System.out.println(taskManager.getTasks());
+        System.out.println("Задачи восстановленного менеджера:");
+        System.out.println(taskManager2.getTasks());
+
+        System.out.println("Эпики основного менеджера:");
+        System.out.println(taskManager.getEpics());
+        System.out.println("Эпики восстановленного менеджера:");
+        System.out.println(taskManager2.getEpics());
+
+        System.out.println("Подзадачи основного менеджера:");
+        System.out.println(taskManager.getSubTasks());
+        System.out.println("Подзадачи восстановленного менеджера:");
+        System.out.println(taskManager2.getSubTasks());
     }
 
 }

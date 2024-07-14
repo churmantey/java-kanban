@@ -7,25 +7,45 @@ import dc.yandex.kanban.model.TaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class InMemoryTaskManagerTest {
+public class FileBackedTaskManagerTest {
 
     private TaskManager manager;
+    private File tmpFile;
+    private Task task, taskFromManager, updatedTask;
+    private Epic epic, epicFromManager, updatedEpic;
+    private SubTask subTask, subTaskFromManager, updatedSubTask;
 
     @BeforeEach
     public void beforeEach() {
-        manager = new InMemoryTaskManager();
+        try {
+            tmpFile = File.createTempFile("test_", ".txt");
+            manager = new FileBackedTaskManager(tmpFile.getAbsolutePath());
+            System.out.println(tmpFile.getAbsolutePath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        task = new Task(1, "Задача 1", "Описание 1");
+        updatedTask = new Task(1, "Задача 1 Новое", "Описание 1 Новое");
+        epic = new Epic(2, "Эпик 1", "Описание эпика 1");
+        updatedEpic = new Epic(2, "Эпик 1 Новое", "Описание эпика 1 Новое");
+        subTask = new SubTask(epic, 3, "Подзадача 1 эпика 1", "Описание подзадачи 1");
+        updatedSubTask = new SubTask(epic, 3, "Подзадача 1 эпика 1 обновленная",
+                "Описание подзадачи 1 обновленное");
     }
 
     @Test
     public void shouldAddTaskAndCheckFields() {
-        Task task = new Task(1, "Задача 1", "Описание 1");
         manager.addTask(task);
-        Task taskFromManager = manager.getTaskById(1);
+        taskFromManager = manager.getTaskById(1);
         List<Task> taskList = manager.getTasks();
 
         assertNotNull(taskFromManager, "Задача не найдена.");
@@ -38,9 +58,8 @@ class InMemoryTaskManagerTest {
 
     @Test
     public void shouldAddEpicAndCheckFields() {
-        Epic epic = new Epic(1, "Эпик 1", "Описание эпика 1");
         manager.addEpic(epic);
-        Task epicFromManager = manager.getTaskById(1);
+        epicFromManager = (Epic) manager.getTaskById(2);
         List<Epic> taskList = manager.getEpics();
 
         assertNotNull(epicFromManager, "Эпик не найден.");
@@ -53,10 +72,8 @@ class InMemoryTaskManagerTest {
 
     @Test
     public void shouldAddSubtaskAndCheckFields() {
-        Epic epic = new Epic(1, "Эпик 1", "Описание эпика 1");
-        SubTask subTask = new SubTask(epic, 2, "Подзадача 1 эпика 1", "Описание подзадачи 1");
         manager.addSubTask(subTask);
-        Task subTaskFromManager = manager.getTaskById(2);
+        subTaskFromManager = (SubTask) manager.getTaskById(3);
         List<SubTask> taskList = manager.getSubTasks();
 
         assertNotNull(subTaskFromManager, "Подзадача не найдена.");
@@ -69,8 +86,6 @@ class InMemoryTaskManagerTest {
 
     @Test
     public void shouldNotAddEpicAndSubtaskAsTask() {
-        Epic epic = new Epic(1, "Эпик 1", "Описание эпика 1");
-        SubTask subTask = new SubTask(epic, 2, "Подзадача 1 эпика 1", "Описание подзадачи 1");
         manager.addTask(epic);
         manager.addTask(subTask);
         List<Task> taskList = manager.getTasks();
@@ -80,12 +95,10 @@ class InMemoryTaskManagerTest {
 
     @Test
     public void shouldUpdateTask() {
-        Task task = new Task(1, "Задача 1", "Описание 1");
         manager.addTask(task);
-        Task updatedTask = new Task(1, "Задача 1 Новое", "Описание 1 Новое");
         updatedTask.setStatus(TaskStatus.IN_PROGRESS);
         manager.updateTask(updatedTask);
-        Task taskFromManager = manager.getTaskById(1);
+        taskFromManager = manager.getTaskById(1);
 
         assertEquals(updatedTask.getId(), taskFromManager.getId());
         assertEquals(updatedTask.getName(), taskFromManager.getName());
@@ -95,11 +108,9 @@ class InMemoryTaskManagerTest {
 
     @Test
     public void shouldUpdateEpic() {
-        Epic epic = new Epic(1, "Эпик 1", "Описание эпика 1");
         manager.addEpic(epic);
-        Epic updatedEpic = new Epic(1, "Эпик 1 Новое", "Описание эпика 1 Новое");
         manager.updateEpic(updatedEpic);
-        Task epicFromManager = manager.getTaskById(1);
+        epicFromManager = (Epic) manager.getTaskById(2);
 
         assertEquals(updatedEpic.getId(), epicFromManager.getId());
         assertEquals(updatedEpic.getName(), epicFromManager.getName());
@@ -108,18 +119,14 @@ class InMemoryTaskManagerTest {
 
     @Test
     public void shouldUpdateSubTask() {
-        Epic epic = new Epic(1, "Эпик 1", "Описание эпика 1");
-        SubTask subTask = new SubTask(epic, 2, "Подзадача 1 эпика 1", "Описание подзадачи 1");
         manager.addEpic(epic);
         manager.addSubTask(subTask);
-        SubTask updatedSubTask = new SubTask(epic, 2, "Подзадача 1 эпика 1 обновленная",
-                "Описание подзадачи 1 обновленное");
         updatedSubTask.setStatus(TaskStatus.IN_PROGRESS);
         epic.addSubTask(updatedSubTask);
         manager.updateSubTask(updatedSubTask);
 
-        Task epicFromManager = manager.getTaskById(1);
-        Task subTaskFromManager = manager.getTaskById(2);
+        epicFromManager = (Epic) manager.getTaskById(2);
+        subTaskFromManager = (SubTask) manager.getTaskById(3);
 
         assertEquals(updatedSubTask.getId(), subTaskFromManager.getId());
         assertEquals(updatedSubTask.getName(), subTaskFromManager.getName());
@@ -130,9 +137,7 @@ class InMemoryTaskManagerTest {
 
     @Test
     public void shouldDeleteTask() {
-        Epic epic = new Epic(1, "Эпик 1", "Описание эпика 1");
-        SubTask subTask = new SubTask(epic, 2, "Подзадача 1 эпика 1", "Описание подзадачи 1");
-        Task task = new Task(3, "Задача 1", "Описание 1");
+        task = new Task(3, "Задача 1", "Описание 1");
         manager.addEpic(epic);
         manager.addSubTask(subTask);
         manager.addTask(task);
@@ -155,7 +160,8 @@ class InMemoryTaskManagerTest {
         Epic manualEpic = new Epic(2, "Ручной эпик 2", "Описание ручного эпика 2");
         SubTask managerSubTask = manager.createNewSubtask(managerEpic,
                 "Подзадача 3 создана менеджером", "Описание 3");
-        SubTask manualSubTask = new SubTask(manualEpic, 3, "Ручная подзадача 3", "Описание ручной подзадачи 3");
+        SubTask manualSubTask = new SubTask(manualEpic, 3, "Ручная подзадача 3",
+                "Описание ручной подзадачи 3");
 
         manager.addTask(managerTask);
         manager.addTask(manualTask);
@@ -168,4 +174,78 @@ class InMemoryTaskManagerTest {
         assertEquals(manualEpic, manager.getTaskById(managerEpic.getId()));
         assertEquals(manualSubTask, manager.getTaskById(managerSubTask.getId()));
     }
+
+    @Test
+    public void shouldSaveToFile() {
+        Task managerTask = manager.createNewTask("Задача 1 создана менеджером", "Описание 1");
+        manager.addTask(managerTask);
+        // в файле должно быть две строки
+        try {
+            List<String> lines = Files.readAllLines(tmpFile.toPath());
+            assertEquals(2, lines.size());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        manager.deleteTaskById(managerTask.getId());
+        // в файле должна остаться одна строка
+        try {
+            List<String> lines = Files.readAllLines(tmpFile.toPath());
+            assertEquals(1, lines.size());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void shouldRestoreFromFile() {
+        Task managerTask = manager.createNewTask("Задача 1 создана менеджером", "Описание 1");
+        Epic managerEpic = manager.createNewEpic("Эпик 2 создан менеджером", "Описание 2");
+        SubTask managerSubTask = manager.createNewSubtask(managerEpic,
+                "Подзадача 3 создана менеджером", "Описание 3");
+
+        manager.addTask(managerTask);
+        manager.addEpic(managerEpic);
+        manager.addSubTask(managerSubTask);
+
+        try {
+            File tmpFile2 = File.createTempFile("test_", ".txt");
+            Files.copy(tmpFile.toPath(), tmpFile2.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            FileBackedTaskManager taskManagerRestored = FileBackedTaskManager.loadFromFile(tmpFile2);
+
+            assertEquals(managerTask, taskManagerRestored.getTaskById(managerTask.getId()));
+            assertEquals(managerEpic, taskManagerRestored.getTaskById(managerEpic.getId()));
+            assertEquals(managerSubTask, taskManagerRestored.getTaskById(managerSubTask.getId()));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void shouldRestoreFromEmptyFile() {
+        try {
+            File tmpFile2 = File.createTempFile("test_", ".txt");
+            FileBackedTaskManager taskManagerRestored = FileBackedTaskManager.loadFromFile(tmpFile2);
+            assertEquals(0, taskManagerRestored.getTasks().size());
+            assertEquals(0, taskManagerRestored.getEpics().size());
+            assertEquals(0, taskManagerRestored.getSubTasks().size());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void shouldRestoreFromNonexistingFile() {
+        try {
+            File tmpFile2 = File.createTempFile("test_", ".txt");
+            tmpFile2.delete();
+            FileBackedTaskManager taskManagerRestored = FileBackedTaskManager.loadFromFile(tmpFile2);
+            assertEquals(0, taskManagerRestored.getTasks().size());
+            assertEquals(0, taskManagerRestored.getEpics().size());
+            assertEquals(0, taskManagerRestored.getSubTasks().size());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }
