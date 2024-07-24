@@ -1,5 +1,7 @@
 package dc.yandex.kanban.model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
@@ -8,6 +10,8 @@ public class Task {
     private String description;
     private TaskStatus status;
     protected TaskType type;
+    protected LocalDateTime startTime;
+    protected Duration duration;
 
     public Task(int id, String name, String description) {
         this.id = id;
@@ -15,6 +19,8 @@ public class Task {
         this.description = description;
         this.status = TaskStatus.NEW;
         this.type = TaskType.TASK;
+        this.startTime = LocalDateTime.MIN;
+        this.duration = Duration.ZERO;
     }
 
     // Очищает данные задачи (при удалении)
@@ -54,6 +60,22 @@ public class Task {
         this.status = status;
     }
 
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime.plus(duration);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -74,6 +96,8 @@ public class Task {
                 ", status='" + getStatus() + '\'' +
                 ", name='" + getName() + '\'' +
                 ", description='" + getDescription() + '\'' +
+                ", start_time='" + getStartTime() + '\'' +
+                ", end_time='" + getEndTime() + '\'' +
                 '}';
     }
 }

@@ -11,7 +11,6 @@ public class InMemoryHistoryManager implements HistoryManager {
     private Node head; // "голова" списка истории
     private Node tail; // "хвост" списка истории
 
-
     public InMemoryHistoryManager() {
         taskHistoryMap = new HashMap<>();
         head = null;

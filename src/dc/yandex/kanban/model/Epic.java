@@ -1,23 +1,27 @@
 package dc.yandex.kanban.model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Epic extends Task {
 
     private final HashMap<Integer, SubTask> subTasks; // Список подзадач эпика
+    private LocalDateTime endTime;
 
     public Epic(int id, String name, String description) {
         super(id, name, description);
         subTasks = new HashMap<>();
         this.type = TaskType.EPIC;
+        this.endTime = LocalDateTime.MIN;
     }
 
     // Добавляет подзадачу эпика
     public void addSubTask(SubTask subTask) {
         if (subTask != null) {
             subTasks.put(subTask.getId(), subTask);
-            updateStatus();
+            updateStatusAndTime();
         }
     }
 
@@ -25,14 +29,14 @@ public class Epic extends Task {
     public void deleteSubTask(SubTask subTask) {
         if (subTask != null) {
             subTasks.remove(subTask.getId());
-            updateStatus();
+            updateStatusAndTime();
         }
     }
 
     // Удаляет все подзадачи эпика
     public void deleteAllSubTasks() {
         subTasks.clear();
-        updateStatus();
+        updateStatusAndTime();
     }
 
     // Возвращает список всех подзадач эпика
@@ -41,24 +45,19 @@ public class Epic extends Task {
     }
 
     // Обновляет статус эпика на основе статусов подзадач
-    public void updateStatus() {
-        boolean hasNew = false; // флаг наличия подзадач в статусе NEW
-        boolean hasInProgress = false; // флаг наличия подзадач в статусе IN_PROGRESS
-        boolean hasDone = false; // флаг наличия подзадач в статусе DONE
+    // и рассчитывает продолжительность
+    public void updateStatusAndTime() {
+        // флаг наличия подзадач в статусе NEW
+        boolean hasNew = subTasks.values().stream()
+                .anyMatch(subTask -> subTask.getStatus().equals(TaskStatus.NEW));
 
-        for (SubTask subTask : subTasks.values()) {
-            switch (subTask.getStatus()) {
-                case IN_PROGRESS:
-                    hasInProgress = true;
-                    break;
-                case DONE:
-                    hasDone = true;
-                    break;
-                default:
-                    hasNew = true;
-            }
-            if (hasInProgress) break;
-        }
+        // флаг наличия подзадач в статусе IN_PROGRESS
+        boolean hasInProgress = subTasks.values().stream()
+                .anyMatch(subTask -> subTask.getStatus().equals(TaskStatus.IN_PROGRESS));
+
+        // флаг наличия подзадач в статусе DONE
+        boolean hasDone = subTasks.values().stream()
+                .anyMatch(subTask -> subTask.getStatus().equals(TaskStatus.DONE));
 
         if (hasInProgress || (hasDone && hasNew)) {
             super.setStatus(TaskStatus.IN_PROGRESS);
@@ -67,11 +66,47 @@ public class Epic extends Task {
         } else {
             super.setStatus(TaskStatus.NEW);
         }
+
+        // расчет времени начала/окончания и продолжительности
+        startTime = LocalDateTime.MIN;
+        endTime = LocalDateTime.MIN;
+        duration = Duration.ZERO;
+
+        subTasks.values().stream()
+                .min((SubTask t1, SubTask t2) -> {
+                    if (t1.startTime.isAfter(t2.startTime)) return 1;
+                    if (t1.startTime.isBefore(t2.startTime)) return -1;
+                    return 0;
+                }).ifPresent(subTask -> startTime = subTask.getStartTime());
+
+        subTasks.values().stream()
+                .max((SubTask t1, SubTask t2) -> {
+                    if (t1.getEndTime().isAfter(t2.getEndTime())) return 1;
+                    if (t1.getEndTime().isBefore(t2.getEndTime())) return -1;
+                    return 0;
+                }).ifPresent(subTask -> endTime = subTask.getEndTime());
+
+        duration = Duration.between(startTime, endTime);
+    }
+
+    @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 
     // Отключаем самостоятельное обновление статуса эпика пустым методом
     @Override
     public void setStatus(TaskStatus status) {
+    }
+
+    // Отключаем самостоятельное обновление времени начала эпика пустым методом
+    @Override
+    public void setStartTime(LocalDateTime startTime) {
+    }
+
+    // Отключаем самостоятельное обновление продолжительности
+    @Override
+    public void setDuration(Duration duration) {
     }
 
     @Override
@@ -82,6 +117,8 @@ public class Epic extends Task {
                 ", status='" + super.getStatus() + '\'' +
                 ", name='" + super.getName() + '\'' +
                 ", description='" + super.getDescription() + '\'' +
+                ", start_time='" + getStartTime() + '\'' +
+                ", end_time='" + getEndTime() + '\'' +
                 '}';
     }
 

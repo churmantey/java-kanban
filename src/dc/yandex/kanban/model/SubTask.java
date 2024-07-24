@@ -18,7 +18,7 @@ public class SubTask extends Task {
     @Override
     public void setStatus(TaskStatus status) {
         super.setStatus(status);
-        parentTask.updateStatus();
+        parentTask.updateStatusAndTime();
     }
 
     @Override
@@ -29,6 +29,8 @@ public class SubTask extends Task {
                 ", status='" + super.getStatus() + '\'' +
                 ", name='" + super.getName() + '\'' +
                 ", description='" + super.getDescription() + '\'' +
+                ", start_time='" + getStartTime() + '\'' +
+                ", end_time='" + getEndTime() + '\'' +
                 '}';
     }
 
