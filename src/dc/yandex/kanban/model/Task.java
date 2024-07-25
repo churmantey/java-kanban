@@ -23,6 +23,16 @@ public class Task {
         this.duration = Duration.ZERO;
     }
 
+    public Task(int id, String name, String description, LocalDateTime startTime, Duration duration) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.status = TaskStatus.NEW;
+        this.type = TaskType.TASK;
+        this.startTime = startTime;
+        this.duration = duration;
+    }
+
     // Очищает данные задачи (при удалении)
     public void clearData() {
         id = 0;
@@ -72,6 +82,9 @@ public class Task {
         this.duration = duration;
     }
 
+    public Duration getDuration() {
+        return duration;
+    }
     public LocalDateTime getEndTime() {
         return startTime.plus(duration);
     }

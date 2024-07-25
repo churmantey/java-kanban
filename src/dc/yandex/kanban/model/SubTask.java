@@ -1,11 +1,20 @@
 package dc.yandex.kanban.model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class SubTask extends Task {
 
     private final Epic parentTask;
 
     public SubTask(Epic parentTask, int id, String name, String description) {
         super(id, name, description);
+        this.parentTask = parentTask;
+        this.type = TaskType.SUBTASK;
+    }
+
+    public SubTask(Epic parentTask, int id, String name, String description, LocalDateTime startTime, Duration duration) {
+        super(id, name, description, startTime, duration);
         this.parentTask = parentTask;
         this.type = TaskType.SUBTASK;
     }

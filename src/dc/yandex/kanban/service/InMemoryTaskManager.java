@@ -3,11 +3,9 @@ package dc.yandex.kanban.service;
 import dc.yandex.kanban.model.Epic;
 import dc.yandex.kanban.model.SubTask;
 import dc.yandex.kanban.model.Task;
+import dc.yandex.kanban.model.TaskStartTimeComparator;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
 
@@ -15,8 +13,10 @@ public class InMemoryTaskManager implements TaskManager {
     private final Map<Integer, Epic> epicList; // Список всех эпиков
     private final Map<Integer, SubTask> subTaskList; // Список всех подзадач
     private int taskCounter; // Счетчик для id задач,эпиков и подзадач
-
     private final HistoryManager historyManager;
+
+    private final TreeSet<Task> prioritizedTaskList;
+    private final TreeSet<SubTask> prioritizedSubTaskList;
 
     public InMemoryTaskManager() {
         taskList = new HashMap<>();
@@ -24,11 +24,25 @@ public class InMemoryTaskManager implements TaskManager {
         subTaskList = new HashMap<>();
         taskCounter = 0;
         historyManager = Managers.getDefaultHistory();
+
+        TaskStartTimeComparator taskStartTimeComparator = new TaskStartTimeComparator();
+        prioritizedTaskList = new TreeSet<>(taskStartTimeComparator);
+        prioritizedSubTaskList = new TreeSet<>(taskStartTimeComparator);
     }
 
     // Устанавливает счетчик для id задач
     public void setTaskCounter(int taskCounter) {
         this.taskCounter = taskCounter;
+    }
+
+    @Override
+    public List<Task> getPrioritizedTasks() {
+        return new ArrayList<>(prioritizedTaskList);
+    }
+
+    @Override
+    public List<SubTask> getPrioritizedSubTasks() {
+        return new ArrayList<>(prioritizedSubTaskList);
     }
 
     // Получает список всех обычных задач

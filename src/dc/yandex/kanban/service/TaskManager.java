@@ -17,6 +17,12 @@ public interface TaskManager {
     // Получает список всех подзадач
     List<SubTask> getSubTasks();
 
+    // Список обычных задач, отсортированный по времени начала
+    List<Task> getPrioritizedTasks();
+
+    // Список обычных задач, отсортированный по времени начала
+    List<SubTask> getPrioritizedSubTasks();
+
     // Получает список всех подзадач эпика по id эпика
     List<SubTask> getEpicSubTasksById(int epicId);
 

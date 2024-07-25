@@ -17,6 +17,13 @@ public class Epic extends Task {
         this.endTime = LocalDateTime.MIN;
     }
 
+    public Epic(int id, String name, String description, LocalDateTime startTime, Duration duration) {
+        super(id, name, description, startTime, duration);
+        subTasks = new HashMap<>();
+        this.type = TaskType.EPIC;
+        this.endTime = startTime.plus(duration);
+    }
+
     // Добавляет подзадачу эпика
     public void addSubTask(SubTask subTask) {
         if (subTask != null) {
