@@ -104,4 +104,51 @@ class InMemoryHistoryManagerTest {
         assertEquals(0, manager.getHistory().size(), "Задачи не удалены из истории.");
     }
 
+    @Test
+    public void shouldBeEmptyHistory() {
+        history = manager.getHistory();
+        assertEquals(0, history.size(), "Задачи не добавлены в историю.");
+    }
+
+    @Test
+    public void shouldRemoveHead() {
+        manager.add(task);
+        manager.add(epic);
+        manager.add(subTask);
+
+        manager.remove(task.getId());
+        history = manager.getHistory();
+
+        assertEquals(2, history.size());
+        assertEquals(epic, history.get(0));
+        assertEquals(subTask, history.get(1));
+    }
+
+    @Test
+    public void shouldRemoveTail() {
+        manager.add(task);
+        manager.add(epic);
+        manager.add(subTask);
+
+        manager.remove(subTask.getId());
+        history = manager.getHistory();
+
+        assertEquals(2, history.size(), "Задача не удалена из истории.");
+        assertEquals(task, history.get(0));
+        assertEquals(epic, history.get(1));
+    }
+
+    @Test
+    public void shouldRemoveMiddle() {
+        manager.add(epic);
+        manager.add(task);
+        manager.add(subTask);
+
+        manager.remove(task.getId());
+        history = manager.getHistory();
+
+        assertEquals(2, history.size(), "Задача не удалена из истории.");
+        assertEquals(epic, history.get(0));
+        assertEquals(subTask, history.get(1));
+    }
 }

@@ -101,10 +101,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     // Выводит задачи из списка в виде строк в буфер вывода
     private void writeTaskList(BufferedWriter bufferedWriter, List<? extends Task> taskList) throws IOException {
-        for (Task task : taskList) {
-            bufferedWriter.write(toString(task));
-            bufferedWriter.newLine();
-        }
+        taskList.forEach(task -> {
+            try {
+                bufferedWriter.write(toString(task));
+                bufferedWriter.newLine();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+        });
     }
 
     // Возвращает объект менеджера, восстановленного из файла

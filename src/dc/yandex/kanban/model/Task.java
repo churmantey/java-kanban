@@ -1,7 +1,9 @@
 package dc.yandex.kanban.model;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Objects;
 
 public class Task {
@@ -13,13 +15,16 @@ public class Task {
     protected LocalDateTime startTime;
     protected Duration duration;
 
+    public static final LocalDateTime emptyDate = LocalDateTime.ofInstant(
+            Instant.ofEpochSecond(0), ZoneId.of("UTC+0"));
+
     public Task(int id, String name, String description) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.status = TaskStatus.NEW;
         this.type = TaskType.TASK;
-        this.startTime = LocalDateTime.MIN;
+        this.startTime = emptyDate;
         this.duration = Duration.ZERO;
     }
 
@@ -85,6 +90,7 @@ public class Task {
     public Duration getDuration() {
         return duration;
     }
+
     public LocalDateTime getEndTime() {
         return startTime.plus(duration);
     }

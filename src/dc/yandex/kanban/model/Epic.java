@@ -14,7 +14,7 @@ public class Epic extends Task {
         super(id, name, description);
         subTasks = new HashMap<>();
         this.type = TaskType.EPIC;
-        this.endTime = LocalDateTime.MIN;
+        this.endTime = emptyDate;
     }
 
     public Epic(int id, String name, String description, LocalDateTime startTime, Duration duration) {
@@ -75,8 +75,8 @@ public class Epic extends Task {
         }
 
         // расчет времени начала/окончания и продолжительности
-        startTime = LocalDateTime.MIN;
-        endTime = LocalDateTime.MIN;
+        startTime = emptyDate;
+        endTime = emptyDate;
         duration = Duration.ZERO;
 
         subTasks.values().stream()
