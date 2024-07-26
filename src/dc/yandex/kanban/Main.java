@@ -120,7 +120,7 @@ public class Main {
         try {
             taskManager.addTask(task2);
         } catch (RuntimeException e) {
-            System.out.println("Поймано исключение:\n"+e.getMessage());
+            System.out.println("Поймано исключение:\n" + e.getMessage());
         }
 
         System.out.println(" ======== BY PRIORITY ========= ");
