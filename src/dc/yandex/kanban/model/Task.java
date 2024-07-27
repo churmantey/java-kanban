@@ -1,9 +1,7 @@
 package dc.yandex.kanban.model;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Objects;
 
 public class Task {
@@ -11,20 +9,16 @@ public class Task {
     private String name;
     private String description;
     private TaskStatus status;
-    protected TaskType type;
     protected LocalDateTime startTime;
     protected Duration duration;
 
-    public static final LocalDateTime emptyDate = LocalDateTime.ofInstant(
-            Instant.ofEpochSecond(0), ZoneId.of("UTC+0"));
 
     public Task(int id, String name, String description) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.status = TaskStatus.NEW;
-        this.type = TaskType.TASK;
-        this.startTime = emptyDate;
+        this.startTime = null;
         this.duration = Duration.ZERO;
     }
 
@@ -33,7 +27,6 @@ public class Task {
         this.name = name;
         this.description = description;
         this.status = TaskStatus.NEW;
-        this.type = TaskType.TASK;
         this.startTime = startTime;
         this.duration = duration;
     }
@@ -44,7 +37,7 @@ public class Task {
     }
 
     public TaskType getType() {
-        return type;
+        return TaskType.TASK;
     }
 
     public String getName() {
@@ -92,7 +85,9 @@ public class Task {
     }
 
     public LocalDateTime getEndTime() {
-        return startTime.plus(duration);
+        if (startTime == null) return null;
+        else if (duration == null) return startTime;
+        else return startTime.plus(duration);
     }
 
     @Override

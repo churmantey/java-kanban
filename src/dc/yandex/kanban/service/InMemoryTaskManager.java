@@ -30,7 +30,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Добавляет задачу в приоритизированный список
     public void prioritize(Task task) {
-        if (task != null && task.getStartTime() != null && task.getStartTime().isAfter(Task.emptyDate)) {
+        if (task != null && task.getStartTime() != null) {
             prioritizedTaskList.add(task);
         }
     }
@@ -38,12 +38,15 @@ public class InMemoryTaskManager implements TaskManager {
     // Проверяет пересечение по времени с другими задачами
     public boolean tasksInterfere(Task t1, Task t2) {
         if (t1.equals(t2)) return false;
+
         LocalDateTime t1Start = t1.getStartTime();
         LocalDateTime t1End = t1.getEndTime();
         LocalDateTime t2Start = t2.getStartTime();
         LocalDateTime t2End = t2.getEndTime();
-        return (!t1Start.isBefore(t2Start) && !t1Start.isAfter(t2End))
-                || (!t1End.isBefore(t2Start) && !t1End.isAfter(t2End));
+
+        if (t1Start == null || t2Start == null) return false;
+        if (!t1End.isAfter(t2Start)) return false;
+        return t2End.isAfter(t1Start);
     }
 
     // Устанавливает счетчик для id задач

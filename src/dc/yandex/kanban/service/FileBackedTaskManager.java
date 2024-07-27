@@ -18,6 +18,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private final String filename; // имя файла для хранения состояния менеджера
     private final String delimiter = ","; // разделитель значений в строках файла
+    private static final String fileHeader = "id,type,start_time,duration,name,status,description,epic";
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     public FileBackedTaskManager(String filename) {
@@ -87,9 +88,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     // Сохраняет состояние менеджера в файл
     public void save() {
-        String header = "id,type,start_time,duration,name,status,description,epic";
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(filename, StandardCharsets.UTF_8))) {
-            bufferedWriter.write(header);
+            bufferedWriter.write(fileHeader);
             bufferedWriter.newLine();
             writeTaskList(bufferedWriter, getTasks());
             writeTaskList(bufferedWriter, getEpics());
@@ -154,8 +154,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         if (task != null) {
             parts.add(Integer.toString(task.getId()));
             parts.add(task.getType().name());
-            parts.add(task.getStartTime().format(dateTimeFormatter));
-            parts.add(Long.toString(task.getDuration().toMinutes()));
+
+            if (task.getStartTime() != null) parts.add(task.getStartTime().format(dateTimeFormatter));
+            else parts.add("");
+
+            if (task.getDuration() != null) parts.add(Long.toString(task.getDuration().toMinutes()));
+            else parts.add("");
+
             parts.add(task.getName());
             parts.add(task.getStatus().name());
             parts.add(task.getDescription());
@@ -181,10 +186,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
 
         Task task;
+        LocalDateTime taskTime = null;
+        Duration taskDuration = Duration.ZERO;
+
         int taskId = Integer.parseInt(parts[0]);
         TaskType taskType = TaskType.valueOf(parts[1]);
-        LocalDateTime taskTime = LocalDateTime.parse(parts[2], dateTimeFormatter);
-        Duration taskDuration = Duration.ofMinutes(Long.parseLong(parts[3]));
+        if (!parts[2].isBlank()) taskTime = LocalDateTime.parse(parts[2], dateTimeFormatter);
+        if (!parts[3].isBlank()) taskDuration = Duration.ofMinutes(Long.parseLong(parts[3]));
         String taskName = parts[4];
         TaskStatus taskStatus = TaskStatus.valueOf(parts[5]);
         String taskDescription = parts[6];
@@ -198,11 +206,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 break;
             case SUBTASK:
                 task = new SubTask((Epic) getTaskById(epicId), taskId, taskName, taskDescription, taskTime, taskDuration);
+                task.setStatus(taskStatus);
                 break;
             default:
                 task = new Task(taskId, taskName, taskDescription, taskTime, taskDuration);
+                task.setStatus(taskStatus);
         }
-        task.setStatus(taskStatus);
         return task;
     }
 

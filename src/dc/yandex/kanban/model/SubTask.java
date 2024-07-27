@@ -10,13 +10,11 @@ public class SubTask extends Task {
     public SubTask(Epic parentTask, int id, String name, String description) {
         super(id, name, description);
         this.parentTask = parentTask;
-        this.type = TaskType.SUBTASK;
     }
 
     public SubTask(Epic parentTask, int id, String name, String description, LocalDateTime startTime, Duration duration) {
         super(id, name, description, startTime, duration);
         this.parentTask = parentTask;
-        this.type = TaskType.SUBTASK;
     }
 
     // Получает эпик подзадачи
@@ -28,6 +26,11 @@ public class SubTask extends Task {
     public void setStatus(TaskStatus status) {
         super.setStatus(status);
         parentTask.updateStatusAndTime();
+    }
+
+    @Override
+    public TaskType getType() {
+        return TaskType.SUBTASK;
     }
 
     @Override
