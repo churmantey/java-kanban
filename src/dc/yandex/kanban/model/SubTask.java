@@ -1,5 +1,8 @@
 package dc.yandex.kanban.model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class SubTask extends Task {
 
     private final Epic parentTask;
@@ -7,7 +10,11 @@ public class SubTask extends Task {
     public SubTask(Epic parentTask, int id, String name, String description) {
         super(id, name, description);
         this.parentTask = parentTask;
-        this.type = TaskType.SUBTASK;
+    }
+
+    public SubTask(Epic parentTask, int id, String name, String description, LocalDateTime startTime, Duration duration) {
+        super(id, name, description, startTime, duration);
+        this.parentTask = parentTask;
     }
 
     // Получает эпик подзадачи
@@ -18,7 +25,12 @@ public class SubTask extends Task {
     @Override
     public void setStatus(TaskStatus status) {
         super.setStatus(status);
-        parentTask.updateStatus();
+        parentTask.updateStatusAndTime();
+    }
+
+    @Override
+    public TaskType getType() {
+        return TaskType.SUBTASK;
     }
 
     @Override
@@ -29,6 +41,8 @@ public class SubTask extends Task {
                 ", status='" + super.getStatus() + '\'' +
                 ", name='" + super.getName() + '\'' +
                 ", description='" + super.getDescription() + '\'' +
+                ", start_time='" + getStartTime() + '\'' +
+                ", end_time='" + getEndTime() + '\'' +
                 '}';
     }
 

@@ -3,11 +3,11 @@ package dc.yandex.kanban.service;
 import dc.yandex.kanban.model.Epic;
 import dc.yandex.kanban.model.SubTask;
 import dc.yandex.kanban.model.Task;
+import dc.yandex.kanban.model.TaskStartTimeComparator;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
 
@@ -15,8 +15,8 @@ public class InMemoryTaskManager implements TaskManager {
     private final Map<Integer, Epic> epicList; // Список всех эпиков
     private final Map<Integer, SubTask> subTaskList; // Список всех подзадач
     private int taskCounter; // Счетчик для id задач,эпиков и подзадач
-
     private final HistoryManager historyManager;
+    private final TreeSet<Task> prioritizedTaskList;
 
     public InMemoryTaskManager() {
         taskList = new HashMap<>();
@@ -24,11 +24,39 @@ public class InMemoryTaskManager implements TaskManager {
         subTaskList = new HashMap<>();
         taskCounter = 0;
         historyManager = Managers.getDefaultHistory();
+
+        prioritizedTaskList = new TreeSet<>(new TaskStartTimeComparator());
+    }
+
+    // Добавляет задачу в приоритизированный список
+    public void prioritize(Task task) {
+        if (task != null && task.getStartTime() != null) {
+            prioritizedTaskList.add(task);
+        }
+    }
+
+    // Проверяет пересечение по времени с другими задачами
+    public boolean tasksInterfere(Task t1, Task t2) {
+        if (t1.equals(t2)) return false;
+
+        LocalDateTime t1Start = t1.getStartTime();
+        LocalDateTime t1End = t1.getEndTime();
+        LocalDateTime t2Start = t2.getStartTime();
+        LocalDateTime t2End = t2.getEndTime();
+
+        if (t1Start == null || t2Start == null) return false;
+        if (!t1End.isAfter(t2Start)) return false;
+        return t2End.isAfter(t1Start);
     }
 
     // Устанавливает счетчик для id задач
     public void setTaskCounter(int taskCounter) {
         this.taskCounter = taskCounter;
+    }
+
+    @Override
+    public List<Task> getPrioritizedTasks() {
+        return new ArrayList<>(prioritizedTaskList);
     }
 
     // Получает список всех обычных задач
@@ -85,7 +113,9 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteTaskById(int taskId) {
         if (taskList.containsKey(taskId)) {
             historyManager.remove(taskId);
-            taskList.remove(taskId).clearData();
+            Task deletedTask = taskList.remove(taskId);
+            prioritizedTaskList.remove(deletedTask);
+            deletedTask.clearData();
         } else if (subTaskList.containsKey(taskId)) {
             // Получаем подзадачу, eё эпик, удаляем подзадачу в эпике, затем в списке.
             SubTask subTask = subTaskList.get(taskId);
@@ -93,14 +123,17 @@ public class InMemoryTaskManager implements TaskManager {
             epic.deleteSubTask(subTask);
             historyManager.remove(taskId);
             subTaskList.remove(taskId).clearData();
+            prioritizedTaskList.remove(subTask);
         } else if (epicList.containsKey(taskId)) {
             // Получаем эпик, удаляем все подзадачи эпика в списке, затем удаляем подзадачи в эпике.
             Epic epic = epicList.get(taskId);
-            ArrayList<SubTask> epicSubTasks = epic.getSubTasks();
-            for (SubTask subTask : epicSubTasks) {
+
+            epic.getSubTasks().forEach(subTask -> {
                 historyManager.remove(subTask.getId());
+                prioritizedTaskList.remove(subTask);
                 subTaskList.remove(subTask.getId()).clearData();
-            }
+            });
+
             epic.deleteAllSubTasks();
             historyManager.remove(taskId);
             epicList.remove(taskId).clearData();
@@ -112,23 +145,23 @@ public class InMemoryTaskManager implements TaskManager {
     // Удаляет все задачи
     @Override
     public void deleteAllTasks() {
-        for (Task task : taskList.values()) {
+        taskList.values().forEach(task -> {
             historyManager.remove(task.getId());
+            prioritizedTaskList.remove(task);
             task.clearData();
-        }
+        });
         taskList.clear();
     }
 
     // Удаляет все подзадачи
     @Override
     public void deleteAllSubTasks() {
-        for (Epic epic : epicList.values()) {
-            epic.deleteAllSubTasks();
-        }
-        for (SubTask subTask : subTaskList.values()) {
+        epicList.values().forEach(Epic::deleteAllSubTasks);
+        subTaskList.values().forEach(subTask -> {
             historyManager.remove(subTask.getId());
+            prioritizedTaskList.remove(subTask);
             subTask.clearData();
-        }
+        });
         subTaskList.clear();
     }
 
@@ -136,10 +169,10 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllEpics() {
         deleteAllSubTasks();
-        for (Epic epic : epicList.values()) {
+        epicList.values().forEach(epic -> {
             historyManager.remove(epic.getId());
             epic.clearData();
-        }
+        });
         epicList.clear();
     }
 
@@ -148,6 +181,11 @@ public class InMemoryTaskManager implements TaskManager {
     public Task createNewTask(String name, String description) {
         taskCounter++;
         return new Task(taskCounter, name, description);
+    }
+
+    public Task createNewTask(String name, String description, LocalDateTime startTime, Duration duration) {
+        taskCounter++;
+        return new Task(taskCounter, name, description, startTime, duration);
     }
 
     // Создает новый объект Epic
@@ -164,11 +202,25 @@ public class InMemoryTaskManager implements TaskManager {
         return new SubTask(epic, taskCounter, name, description);
     }
 
+    public SubTask createNewSubtask(Epic epic, String name, String description, LocalDateTime startTime, Duration duration) {
+        taskCounter++;
+        return new SubTask(epic, taskCounter, name, description, startTime, duration);
+    }
+
+    // Проверяет пересечение задачи по времени выполнения с другими задачами из приоритизированного списка
+    private void checkTimeInterference(Task task) {
+        if (prioritizedTaskList.stream().anyMatch(existingTask -> tasksInterfere(task, existingTask))) {
+            throw new RuntimeException("Есть пересечения по времени с другой задачей");
+        }
+    }
+
     // Добавляет задачу в список
     @Override
     public void addTask(Task task) {
         if (task != null && task.getClass().equals(Task.class)) {
+            checkTimeInterference(task); // проверка пересечения по времени с другими задачами
             taskList.put(task.getId(), task);
+            prioritize(task);
         } else {
             System.out.println("Попытка добавить null-задачу или задачу неподходящего типа.");
         }
@@ -188,8 +240,10 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void addSubTask(SubTask subTask) {
         if (subTask != null) {
+            checkTimeInterference(subTask); // проверка пересечения по времени с другими задачами
             subTaskList.put(subTask.getId(), subTask);
             subTask.getParentTask().addSubTask(subTask);
+            prioritize(subTask);
         } else {
             System.out.println("Попытка добавить подзадачу null");
         }
@@ -200,6 +254,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateTask(Task task) {
         if (task != null) {
             taskList.put(task.getId(), task);
+            prioritize(task);
         } else {
             System.out.println("Попытка добавить задачу null");
         }
@@ -222,6 +277,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (subTask != null) {
             subTaskList.put(subTask.getId(), subTask);
             subTask.getParentTask().addSubTask(subTask);
+            prioritize(subTask);
         } else {
             System.out.println("Попытка добавить подзадачу null");
         }

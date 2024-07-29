@@ -5,12 +5,12 @@ import dc.yandex.kanban.model.Task;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private final HashMap<Integer, Node> taskHistoryMap; // мап для хранения истории
+    private final Map<Integer, Node> taskHistoryMap; // мап для хранения истории
     private Node head; // "голова" списка истории
     private Node tail; // "хвост" списка истории
-
 
     public InMemoryHistoryManager() {
         taskHistoryMap = new HashMap<>();

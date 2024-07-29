@@ -1,9 +1,16 @@
 package dc.yandex.kanban;
 
-import dc.yandex.kanban.model.*;
-import dc.yandex.kanban.service.*;
+import dc.yandex.kanban.model.Epic;
+import dc.yandex.kanban.model.SubTask;
+import dc.yandex.kanban.model.Task;
+import dc.yandex.kanban.model.TaskStatus;
+import dc.yandex.kanban.service.FileBackedTaskManager;
+import dc.yandex.kanban.service.Managers;
+import dc.yandex.kanban.service.TaskManager;
 
 import java.io.File;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class Main {
@@ -102,23 +109,45 @@ public class Main {
         String testFilename = "manager_save.txt";
         FileBackedTaskManager taskManager = new FileBackedTaskManager(testFilename);
 
-        Task task1 = taskManager.createNewTask("Почитать",
-                "Прочитать главу из книги Дж. Оруэлла '1984'");
+        Task task1 = taskManager.createNewTask("Почитать", "Прочитать главу из книги Дж. Оруэлла '1984'",
+                LocalDateTime.of(2024, 7, 24, 11, 55),
+                Duration.ofMinutes(30));
         Task task2 = taskManager.createNewTask("Позаниматься музыкой",
-                "Выучить 'Cullen Bay'");
+                "Выучить 'Cullen Bay'",
+                LocalDateTime.of(2024, 7, 24, 11, 30),
+                Duration.ofMinutes(30));
         taskManager.addTask(task1);
-        taskManager.addTask(task2);
+        try {
+            taskManager.addTask(task2);
+        } catch (RuntimeException e) {
+            System.out.println("Поймано исключение:\n" + e.getMessage());
+        }
+
+        System.out.println(" ======== BY PRIORITY ========= ");
+        System.out.println(taskManager.getPrioritizedTasks());
 
         Epic epic1 = taskManager.createNewEpic("Двухэтажный дом", "Нужен двухэтажный кирпичный");
-        SubTask subTask1e1 = taskManager.createNewSubtask(epic1, "Основание", "Заложить фундамент");
-        SubTask subTask2e1 = taskManager.createNewSubtask(epic1, "Стены", "Возвести стены");
-        SubTask subTask3e1 = taskManager.createNewSubtask(epic1, "Кровля", "Уложить кровлю");
+        SubTask subTask1e1 = taskManager.createNewSubtask(epic1, "Основание", "Заложить фундамент",
+                LocalDateTime.of(2024, 7, 24, 10, 30),
+                Duration.ofMinutes(50));
+        SubTask subTask2e1 = taskManager.createNewSubtask(epic1, "Стены", "Возвести стены",
+                LocalDateTime.of(2024, 7, 30, 14, 23),
+                Duration.ofMinutes(50));
+        SubTask subTask3e1 = taskManager.createNewSubtask(epic1, "Кровля", "Уложить кровлю",
+                LocalDateTime.of(2024, 7, 20, 10, 30),
+                Duration.ofMinutes(40));
         taskManager.addEpic(epic1);
         taskManager.addSubTask(subTask1e1);
         taskManager.addSubTask(subTask2e1);
         taskManager.addSubTask(subTask3e1);
         subTask2e1.setStatus(TaskStatus.IN_PROGRESS);
         taskManager.updateSubTask(subTask2e1);
+
+        System.out.println(" ======== BY PRIORITY ========= ");
+        System.out.println(taskManager.getPrioritizedTasks());
+        System.out.println(" ======== EPIC 1 times  ========= ");
+        System.out.println(" start = " + epic1.getStartTime());
+        System.out.println(" end = " + epic1.getEndTime());
 
         Epic epic2 = taskManager.createNewEpic("Запастить продуктами", "В доме нужна еда");
         taskManager.addEpic(epic2);

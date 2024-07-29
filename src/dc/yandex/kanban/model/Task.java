@@ -1,5 +1,7 @@
 package dc.yandex.kanban.model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
@@ -7,14 +9,26 @@ public class Task {
     private String name;
     private String description;
     private TaskStatus status;
-    protected TaskType type;
+    protected LocalDateTime startTime;
+    protected Duration duration;
+
 
     public Task(int id, String name, String description) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.status = TaskStatus.NEW;
-        this.type = TaskType.TASK;
+        this.startTime = null;
+        this.duration = Duration.ZERO;
+    }
+
+    public Task(int id, String name, String description, LocalDateTime startTime, Duration duration) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.status = TaskStatus.NEW;
+        this.startTime = startTime;
+        this.duration = duration;
     }
 
     // Очищает данные задачи (при удалении)
@@ -23,7 +37,7 @@ public class Task {
     }
 
     public TaskType getType() {
-        return type;
+        return TaskType.TASK;
     }
 
     public String getName() {
@@ -54,6 +68,28 @@ public class Task {
         this.status = status;
     }
 
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public LocalDateTime getEndTime() {
+        if (startTime == null) return null;
+        else if (duration == null) return startTime;
+        else return startTime.plus(duration);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -74,6 +110,8 @@ public class Task {
                 ", status='" + getStatus() + '\'' +
                 ", name='" + getName() + '\'' +
                 ", description='" + getDescription() + '\'' +
+                ", start_time='" + getStartTime() + '\'' +
+                ", end_time='" + getEndTime() + '\'' +
                 '}';
     }
 }

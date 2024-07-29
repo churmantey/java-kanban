@@ -1,23 +1,43 @@
 package dc.yandex.kanban.model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Epic extends Task {
 
-    private final HashMap<Integer, SubTask> subTasks; // Список подзадач эпика
+    private final Map<Integer, SubTask> subTasks; // Список подзадач эпика
+    private LocalDateTime endTime;
 
     public Epic(int id, String name, String description) {
         super(id, name, description);
         subTasks = new HashMap<>();
-        this.type = TaskType.EPIC;
+        this.endTime = null;
+    }
+
+    public Epic(int id, String name, String description, LocalDateTime startTime, Duration duration) {
+        super(id, name, description, startTime, duration);
+        subTasks = new HashMap<>();
+        this.endTime = null;
+        if (startTime != null && duration != null) {
+            this.endTime = startTime.plus(duration);
+        } else if (duration == null) {
+            this.endTime = startTime;
+        }
+    }
+
+    @Override
+    public TaskType getType() {
+        return TaskType.EPIC;
     }
 
     // Добавляет подзадачу эпика
     public void addSubTask(SubTask subTask) {
         if (subTask != null) {
             subTasks.put(subTask.getId(), subTask);
-            updateStatus();
+            updateStatusAndTime();
         }
     }
 
@@ -25,14 +45,14 @@ public class Epic extends Task {
     public void deleteSubTask(SubTask subTask) {
         if (subTask != null) {
             subTasks.remove(subTask.getId());
-            updateStatus();
+            updateStatusAndTime();
         }
     }
 
     // Удаляет все подзадачи эпика
     public void deleteAllSubTasks() {
         subTasks.clear();
-        updateStatus();
+        updateStatusAndTime();
     }
 
     // Возвращает список всех подзадач эпика
@@ -41,10 +61,15 @@ public class Epic extends Task {
     }
 
     // Обновляет статус эпика на основе статусов подзадач
-    public void updateStatus() {
+    // и рассчитывает продолжительность
+    public void updateStatusAndTime() {
+
         boolean hasNew = false; // флаг наличия подзадач в статусе NEW
         boolean hasInProgress = false; // флаг наличия подзадач в статусе IN_PROGRESS
         boolean hasDone = false; // флаг наличия подзадач в статусе DONE
+        startTime = null;
+        endTime = null;
+        duration = Duration.ZERO;
 
         for (SubTask subTask : subTasks.values()) {
             switch (subTask.getStatus()) {
@@ -57,7 +82,14 @@ public class Epic extends Task {
                 default:
                     hasNew = true;
             }
-            if (hasInProgress) break;
+            LocalDateTime subTaskStartTime = subTask.getStartTime();
+            LocalDateTime subTaskEndTime = subTask.getEndTime();
+            if (subTaskStartTime != null && (startTime == null || startTime.isAfter(subTaskStartTime))) {
+                startTime = subTaskStartTime;
+            }
+            if (subTaskEndTime != null && (endTime == null || endTime.isBefore(subTaskEndTime))) {
+                endTime = subTaskEndTime;
+            }
         }
 
         if (hasInProgress || (hasDone && hasNew)) {
@@ -67,11 +99,33 @@ public class Epic extends Task {
         } else {
             super.setStatus(TaskStatus.NEW);
         }
+
+        if (startTime != null && endTime != null) {
+            duration = Duration.between(startTime, endTime);
+        }
+    }
+
+    @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 
     // Отключаем самостоятельное обновление статуса эпика пустым методом
     @Override
     public void setStatus(TaskStatus status) {
+        throw new RuntimeException("Непосредственная установка статуса эпика недопустима.");
+    }
+
+    // Отключаем самостоятельное обновление времени начала эпика пустым методом
+    @Override
+    public void setStartTime(LocalDateTime startTime) {
+        throw new RuntimeException("Непосредственная установка времени начала эпика недопустима.");
+    }
+
+    // Отключаем самостоятельное обновление продолжительности
+    @Override
+    public void setDuration(Duration duration) {
+        throw new RuntimeException("Непосредственная установка продолжительности эпика недопустима.");
     }
 
     @Override
@@ -82,6 +136,8 @@ public class Epic extends Task {
                 ", status='" + super.getStatus() + '\'' +
                 ", name='" + super.getName() + '\'' +
                 ", description='" + super.getDescription() + '\'' +
+                ", start_time='" + getStartTime() + '\'' +
+                ", end_time='" + getEndTime() + '\'' +
                 '}';
     }
 
