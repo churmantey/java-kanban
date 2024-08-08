@@ -3,7 +3,10 @@ package dc.yandex.kanban.service;
 import dc.yandex.kanban.model.Epic;
 import dc.yandex.kanban.model.SubTask;
 import dc.yandex.kanban.model.Task;
+import dc.yandex.kanban.service.exceptions.TaskNotFoundException;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface TaskManager {
@@ -24,7 +27,7 @@ public interface TaskManager {
     List<SubTask> getEpicSubTasksById(int epicId);
 
     // Получает задачу, эпик или подзадачу по переданному id
-    Task getTaskById(int taskId);
+    Task getTaskById(int taskId) throws TaskNotFoundException;
 
     // Удаляет задачу, эпик или подзадачу по переданному id
     void deleteTaskById(int taskId);
@@ -41,11 +44,15 @@ public interface TaskManager {
     // Создает новый объект Task
     Task createNewTask(String name, String description);
 
+    Task createNewTask(String name, String description, LocalDateTime startTime, Duration duration);
+
     // Создает новый объект Epic
     Epic createNewEpic(String name, String description);
 
     // Создает новый объект SubTask
     SubTask createNewSubtask(Epic epic, String name, String description);
+
+    SubTask createNewSubtask(Epic epic, String name, String description, LocalDateTime startTime, Duration duration);
 
     // Добавляет задачу в список
     void addTask(Task task);
