@@ -4,6 +4,8 @@ import dc.yandex.kanban.model.Epic;
 import dc.yandex.kanban.model.SubTask;
 import dc.yandex.kanban.model.Task;
 import dc.yandex.kanban.model.TaskStartTimeComparator;
+import dc.yandex.kanban.service.exceptions.TaskNotFoundException;
+import dc.yandex.kanban.service.exceptions.TaskTimeInterferenceException;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -92,7 +94,7 @@ public class InMemoryTaskManager implements TaskManager {
     // Получает задачу, эпик или подзадачу по переданному id
     @Override
     public Task getTaskById(int taskId) {
-        Task foundTask = null;
+        Task foundTask;
         if (taskList.containsKey(taskId)) {
             foundTask = taskList.get(taskId);
         } else if (subTaskList.containsKey(taskId)) {
@@ -101,6 +103,7 @@ public class InMemoryTaskManager implements TaskManager {
             foundTask = epicList.get(taskId);
         } else {
             System.out.println("Задачи с id " + taskId + " не найдено");
+            throw new TaskNotFoundException("Задачи с id " + taskId + " не существует");
         }
         if (foundTask != null) {
             historyManager.add(foundTask);
@@ -183,6 +186,7 @@ public class InMemoryTaskManager implements TaskManager {
         return new Task(taskCounter, name, description);
     }
 
+    @Override
     public Task createNewTask(String name, String description, LocalDateTime startTime, Duration duration) {
         taskCounter++;
         return new Task(taskCounter, name, description, startTime, duration);
@@ -202,6 +206,7 @@ public class InMemoryTaskManager implements TaskManager {
         return new SubTask(epic, taskCounter, name, description);
     }
 
+    @Override
     public SubTask createNewSubtask(Epic epic, String name, String description, LocalDateTime startTime, Duration duration) {
         taskCounter++;
         return new SubTask(epic, taskCounter, name, description, startTime, duration);
@@ -210,7 +215,7 @@ public class InMemoryTaskManager implements TaskManager {
     // Проверяет пересечение задачи по времени выполнения с другими задачами из приоритизированного списка
     private void checkTimeInterference(Task task) {
         if (prioritizedTaskList.stream().anyMatch(existingTask -> tasksInterfere(task, existingTask))) {
-            throw new RuntimeException("Есть пересечения по времени с другой задачей");
+            throw new TaskTimeInterferenceException("Есть пересечения по времени с другой задачей");
         }
     }
 
