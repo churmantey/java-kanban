@@ -65,42 +65,62 @@ public abstract class BaseHttpHandler implements HttpHandler {
 
     public abstract void handleDelete(HttpExchange exchange, String[] pathParts) throws IOException;
 
-    protected void sendText(HttpExchange h, String text) throws IOException {
-        byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-        h.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-        h.sendResponseHeaders(200, resp.length);
-        h.getResponseBody().write(resp);
-        h.close();
+    protected void sendText(HttpExchange h, String text) {
+        try {
+            byte[] resp = text.getBytes(StandardCharsets.UTF_8);
+            h.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
+            h.sendResponseHeaders(200, resp.length);
+            h.getResponseBody().write(resp);
+            h.close();
+        } catch (IOException e) {
+            System.out.println("Произошла ошибка при отправке ответа:\n" + e.getMessage());
+        }
     }
 
-    protected void sendNoTextOk(HttpExchange h) throws IOException {
-        h.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-        h.sendResponseHeaders(201, 0);
-        h.close();
+    protected void sendNoTextOk(HttpExchange h) {
+        try {
+            h.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
+            h.sendResponseHeaders(201, 0);
+            h.close();
+        } catch (IOException e) {
+            System.out.println("Произошла ошибка при отправке ответа:\n" + e.getMessage());
+        }
     }
 
-    protected void sendNotFound(HttpExchange h, String text) throws IOException {
-        byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-        h.getResponseHeaders().add("Content-Type", "text/plain;charset=utf-8");
-        h.sendResponseHeaders(404, resp.length);
-        h.getResponseBody().write(resp);
-        h.close();
+    protected void sendNotFound(HttpExchange h, String text) {
+        try {
+            byte[] resp = text.getBytes(StandardCharsets.UTF_8);
+            h.getResponseHeaders().add("Content-Type", "text/plain;charset=utf-8");
+            h.sendResponseHeaders(404, resp.length);
+            h.getResponseBody().write(resp);
+            h.close();
+        } catch (IOException e) {
+            System.out.println("Произошла ошибка при отправке ответа:\n" + e.getMessage());
+        }
     }
 
-    protected void sendHasInteraction(HttpExchange h, String text) throws IOException {
-        byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-        h.getResponseHeaders().add("Content-Type", "text/plain;charset=utf-8");
-        h.sendResponseHeaders(406, resp.length);
-        h.getResponseBody().write(resp);
-        h.close();
+    protected void sendHasInteraction(HttpExchange h, String text) {
+        try {
+            byte[] resp = text.getBytes(StandardCharsets.UTF_8);
+            h.getResponseHeaders().add("Content-Type", "text/plain;charset=utf-8");
+            h.sendResponseHeaders(406, resp.length);
+            h.getResponseBody().write(resp);
+            h.close();
+        } catch (IOException e) {
+            System.out.println("Произошла ошибка при отправке ответа:\n" + e.getMessage());
+        }
     }
 
-    protected void sendServerError(HttpExchange h, String text) throws IOException {
-        byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-        h.getResponseHeaders().add("Content-Type", "text/plain;charset=utf-8");
-        h.sendResponseHeaders(500, resp.length);
-        h.getResponseBody().write(resp);
-        h.close();
+    protected void sendServerError(HttpExchange h, String text) {
+        try {
+            byte[] resp = text.getBytes(StandardCharsets.UTF_8);
+            h.getResponseHeaders().add("Content-Type", "text/plain;charset=utf-8");
+            h.sendResponseHeaders(500, resp.length);
+            h.getResponseBody().write(resp);
+            h.close();
+        } catch (IOException e) {
+            System.out.println("Произошла ошибка при отправке ответа:\n" + e.getMessage());
+        }
     }
 
 }

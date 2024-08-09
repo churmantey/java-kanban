@@ -6,12 +6,9 @@ import com.google.gson.stream.JsonWriter;
 import dc.yandex.kanban.model.Task;
 
 import java.io.IOException;
-import java.time.format.DateTimeFormatter;
 
 
 public class TaskAdapter extends TypeAdapter<Task> {
-
-    private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
     @Override
     public void write(JsonWriter jsonWriter, Task task) throws IOException {
@@ -31,7 +28,7 @@ public class TaskAdapter extends TypeAdapter<Task> {
         jsonWriter.name("description").value(task.getDescription());
         jsonWriter.name("status").value(task.getStatus().toString());
         if (task.getStartTime() != null) {
-            jsonWriter.name("startTime").value(task.getStartTime().format(dtf));
+            jsonWriter.name("startTime").value(task.getStartTime().format(LocalDateTimeAdapter.defaultDateTimeFormatter));
         } else {
             jsonWriter.name("startTime").nullValue();
         }
