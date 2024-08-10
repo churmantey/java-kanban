@@ -73,9 +73,19 @@ public class EpicHandler extends BaseHttpHandler {
     public void handlePost(HttpExchange exchange, String[] pathParts) throws IOException {
         if (pathParts.length == 2) {  // создаем новый эпик
             String taskData = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-            JsonElement jsonElement = JsonParser.parseString(taskData);
+            JsonElement jsonElement;
+            try {
+                jsonElement = JsonParser.parseString(taskData);
+            } catch (Exception e) {
+                sendNotFound(exchange, "Передана некорректная структура эпика");
+                return;
+            }
             if (jsonElement.isJsonObject()) {
                 JsonObject jsonObject = jsonElement.getAsJsonObject();
+                if (jsonObject.get("name") == null || jsonObject.get("description") == null) {
+                    sendNotFound(exchange, "Передана некорректная структура эпика");
+                    return;
+                }
                 Epic task = manager.createNewEpic(
                         jsonObject.get("name").getAsString(),
                         jsonObject.get("description").getAsString());

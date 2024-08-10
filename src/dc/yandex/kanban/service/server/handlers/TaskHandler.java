@@ -56,9 +56,24 @@ public class TaskHandler extends BaseHttpHandler {
     public void handlePost(HttpExchange exchange, String[] pathParts) throws IOException {
         if (pathParts.length == 2) {  // создаем новую задачу
             String taskData = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-            JsonElement jsonElement = JsonParser.parseString(taskData);
+            JsonElement jsonElement;
+            try {
+                jsonElement = JsonParser.parseString(taskData);
+            } catch (Exception e) {
+                sendNotFound(exchange, "Передана некорректная структура эпика");
+                return;
+            }
             if (jsonElement.isJsonObject()) {
                 JsonObject jsonObject = jsonElement.getAsJsonObject();
+
+                if (jsonObject.get("name") == null
+                        || jsonObject.get("description") == null
+                        || jsonObject.get("startTime") == null
+                        || jsonObject.get("duration") == null) {
+                    sendNotFound(exchange, "Передана некорректная структура эпика");
+                    return;
+                }
+
                 Task task = manager.createNewTask(
                         jsonObject.get("name").getAsString(),
                         jsonObject.get("description").getAsString(),
