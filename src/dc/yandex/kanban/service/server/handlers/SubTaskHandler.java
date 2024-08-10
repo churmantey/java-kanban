@@ -58,7 +58,7 @@ public class SubTaskHandler extends BaseHttpHandler {
             try {
                 jsonElement = JsonParser.parseString(taskData);
             } catch (Exception e) {
-                sendNotFound(exchange, "Передана некорректная структура эпика");
+                sendNotFound(exchange, "Передана некорректная структура");
                 return;
             }
             if (jsonElement.isJsonObject()) {
@@ -68,7 +68,7 @@ public class SubTaskHandler extends BaseHttpHandler {
                         || jsonObject.get("description") == null
                         || jsonObject.get("startTime") == null
                         || jsonObject.get("duration") == null) {
-                    sendNotFound(exchange, "Передана некорректная структура эпика");
+                    sendNotFound(exchange, "Передана некорректная структура");
                     return;
                 }
                 int epicId = jsonObject.get("parentTask").getAsInt();
@@ -108,7 +108,7 @@ public class SubTaskHandler extends BaseHttpHandler {
                 try {
                     jsonElement = JsonParser.parseString(taskData);
                 } catch (Exception e) {
-                    sendNotFound(exchange, "Передана некорректная структура эпика");
+                    sendNotFound(exchange, "Передана некорректная структура");
                     return;
                 }
                 if (jsonElement.isJsonObject()) {
@@ -118,7 +118,7 @@ public class SubTaskHandler extends BaseHttpHandler {
                             || jsonObject.get("description") == null
                             || jsonObject.get("startTime") == null
                             || jsonObject.get("duration") == null) {
-                        sendNotFound(exchange, "Передана некорректная структура эпика");
+                        sendNotFound(exchange, "Передана некорректная структура");
                         return;
                     }
                     SubTask newTask = new SubTask(

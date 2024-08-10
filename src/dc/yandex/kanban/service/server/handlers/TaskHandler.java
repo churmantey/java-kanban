@@ -60,7 +60,7 @@ public class TaskHandler extends BaseHttpHandler {
             try {
                 jsonElement = JsonParser.parseString(taskData);
             } catch (Exception e) {
-                sendNotFound(exchange, "Передана некорректная структура эпика");
+                sendNotFound(exchange, "Передана некорректная структура");
                 return;
             }
             if (jsonElement.isJsonObject()) {
@@ -70,7 +70,7 @@ public class TaskHandler extends BaseHttpHandler {
                         || jsonObject.get("description") == null
                         || jsonObject.get("startTime") == null
                         || jsonObject.get("duration") == null) {
-                    sendNotFound(exchange, "Передана некорректная структура эпика");
+                    sendNotFound(exchange, "Передана некорректная структура");
                     return;
                 }
 

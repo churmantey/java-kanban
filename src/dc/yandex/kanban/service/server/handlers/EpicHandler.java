@@ -77,13 +77,13 @@ public class EpicHandler extends BaseHttpHandler {
             try {
                 jsonElement = JsonParser.parseString(taskData);
             } catch (Exception e) {
-                sendNotFound(exchange, "Передана некорректная структура эпика");
+                sendNotFound(exchange, "Передана некорректная структура");
                 return;
             }
             if (jsonElement.isJsonObject()) {
                 JsonObject jsonObject = jsonElement.getAsJsonObject();
                 if (jsonObject.get("name") == null || jsonObject.get("description") == null) {
-                    sendNotFound(exchange, "Передана некорректная структура эпика");
+                    sendNotFound(exchange, "Передана некорректная структура");
                     return;
                 }
                 Epic task = manager.createNewEpic(
