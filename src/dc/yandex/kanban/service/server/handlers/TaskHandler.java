@@ -65,15 +65,10 @@ public class TaskHandler extends BaseHttpHandler {
             }
             if (jsonElement.isJsonObject()) {
                 JsonObject jsonObject = jsonElement.getAsJsonObject();
-
-                if (jsonObject.get("name") == null
-                        || jsonObject.get("description") == null
-                        || jsonObject.get("startTime") == null
-                        || jsonObject.get("duration") == null) {
+                if (isIncorrect(jsonObject)) {
                     sendNotFound(exchange, "Передана некорректная структура");
                     return;
                 }
-
                 Task task = manager.createNewTask(
                         jsonObject.get("name").getAsString(),
                         jsonObject.get("description").getAsString(),
@@ -103,6 +98,10 @@ public class TaskHandler extends BaseHttpHandler {
                 JsonElement jsonElement = JsonParser.parseString(taskData);
                 if (jsonElement.isJsonObject()) {
                     JsonObject jsonObject = jsonElement.getAsJsonObject();
+                    if (isIncorrect(jsonObject)) {
+                        sendNotFound(exchange, "Передана некорректная структура");
+                        return;
+                    }
                     Task newTask = new Task(existingTask.getId(),
                             jsonObject.get("name").getAsString(),
                             jsonObject.get("description").getAsString(),
@@ -152,5 +151,14 @@ public class TaskHandler extends BaseHttpHandler {
         } else {
             sendNotFound(exchange, "Некорректный путь запроса");
         }
+    }
+
+    @Override
+    protected boolean isIncorrect(JsonObject jsonObject) {
+        return super.isIncorrect(jsonObject)
+                || jsonObject.get("startTime") == null
+                || jsonObject.get("startTime").getAsString().isBlank()
+                || jsonObject.get("duration") == null
+                || jsonObject.get("duration").getAsString().isBlank();
     }
 }

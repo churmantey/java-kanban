@@ -7,6 +7,7 @@ import dc.yandex.kanban.model.Task;
 
 import java.io.IOException;
 
+import static dc.yandex.kanban.service.server.adapters.LocalDateTimeAdapter.defaultDateTimeFormatter;
 
 public class TaskAdapter extends TypeAdapter<Task> {
 
@@ -28,7 +29,7 @@ public class TaskAdapter extends TypeAdapter<Task> {
         jsonWriter.name("description").value(task.getDescription());
         jsonWriter.name("status").value(task.getStatus().toString());
         if (task.getStartTime() != null) {
-            jsonWriter.name("startTime").value(task.getStartTime().format(LocalDateTimeAdapter.defaultDateTimeFormatter));
+            jsonWriter.name("startTime").value(task.getStartTime().format(defaultDateTimeFormatter));
         } else {
             jsonWriter.name("startTime").nullValue();
         }

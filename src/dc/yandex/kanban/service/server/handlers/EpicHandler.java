@@ -82,7 +82,7 @@ public class EpicHandler extends BaseHttpHandler {
             }
             if (jsonElement.isJsonObject()) {
                 JsonObject jsonObject = jsonElement.getAsJsonObject();
-                if (jsonObject.get("name") == null || jsonObject.get("description") == null) {
+                if (isIncorrect(jsonObject)) {
                     sendNotFound(exchange, "Передана некорректная структура");
                     return;
                 }

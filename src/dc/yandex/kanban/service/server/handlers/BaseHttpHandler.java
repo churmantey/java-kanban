@@ -2,6 +2,7 @@ package dc.yandex.kanban.service.server.handlers;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import dc.yandex.kanban.model.Epic;
@@ -123,4 +124,11 @@ public abstract class BaseHttpHandler implements HttpHandler {
         }
     }
 
+    // Проверяет переданный json на отстутствие полей или пустые значения в них.
+    protected boolean isIncorrect(JsonObject jsonObject) {
+        return jsonObject.get("name") == null
+                || jsonObject.get("name").getAsString().isBlank()
+                || jsonObject.get("description") == null
+                || jsonObject.get("description").getAsString().isBlank();
+    }
 }

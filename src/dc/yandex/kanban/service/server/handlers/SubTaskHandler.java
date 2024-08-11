@@ -63,11 +63,7 @@ public class SubTaskHandler extends BaseHttpHandler {
             }
             if (jsonElement.isJsonObject()) {
                 JsonObject jsonObject = jsonElement.getAsJsonObject();
-                if (jsonObject.get("name") == null
-                        || jsonObject.get("parentTask") == null
-                        || jsonObject.get("description") == null
-                        || jsonObject.get("startTime") == null
-                        || jsonObject.get("duration") == null) {
+                if (isIncorrect(jsonObject)) {
                     sendNotFound(exchange, "Передана некорректная структура");
                     return;
                 }
@@ -113,11 +109,7 @@ public class SubTaskHandler extends BaseHttpHandler {
                 }
                 if (jsonElement.isJsonObject()) {
                     JsonObject jsonObject = jsonElement.getAsJsonObject();
-                    if (jsonObject.get("name") == null
-                            || jsonObject.get("parentTask") == null
-                            || jsonObject.get("description") == null
-                            || jsonObject.get("startTime") == null
-                            || jsonObject.get("duration") == null) {
+                    if (isIncorrect(jsonObject)) {
                         sendNotFound(exchange, "Передана некорректная структура");
                         return;
                     }
@@ -172,5 +164,17 @@ public class SubTaskHandler extends BaseHttpHandler {
             sendNotFound(exchange, "Некорректный путь запроса");
         }
     }
+
+    @Override
+    protected boolean isIncorrect(JsonObject jsonObject) {
+        return super.isIncorrect(jsonObject)
+                || jsonObject.get("parentTask") == null
+                || jsonObject.get("parentTask").getAsString().isBlank()
+                || jsonObject.get("startTime") == null
+                || jsonObject.get("startTime").getAsString().isBlank()
+                || jsonObject.get("duration") == null
+                || jsonObject.get("duration").getAsString().isBlank();
+    }
+
 }
 
